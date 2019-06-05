@@ -16,14 +16,14 @@ private:
 	std::vector<std::vector<cv::Point> > contours;
 	std::vector<cv::Vec4i> hierarchy;
 
-	void getBorder();
+	void getBorder      ();
 	void shiftHueSpace  (cv::Mat *h, int const shift);
 	void extractContours(cv::Mat canny);
-	void binarization   (cv::Mat *img);
+	void binarization   (cv::Mat *img );
 
 public:
 	cv::Mat getSrc     ()              { return this->src; };
-	cv::Mat getBordered(bool force);
+	cv::Mat getBordered(bool force  );
 	void    setSrcImg  (cv::Mat _src);
 
 	Cartographer();

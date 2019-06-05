@@ -4,7 +4,7 @@
 void Cartographer::shiftHueSpace(cv::Mat *h, int const shift)
 {
 	cv::Mat h_tmp = *h;
-	int cv_shift = shift / 2;
+	int cv_shift = shift / 2;	// open cv have hue values from 0 to 180 (cast from 0 to 360)
 
 	for(int i = 0; i < h_tmp.rows; ++i)
 	{
@@ -68,11 +68,11 @@ void Cartographer::getBorder()
 	// this->extractContours(cannyH);
 	/*------------------------------------------------------------*/
 
-	// add contours to source img
+	// draw contours to source img
 	for(int i = 0; i < this->contours.size(); ++i)
 	{
-		if (cv::contourArea(contours[i]) < 400) continue;
-		if (hierarchy[i][3] < 0) continue;
+		if (cv::contourArea(contours[i]) < 400) continue;	// ignore area smaller than 400
+		if (hierarchy[i][3] < 0) continue; 					// ignore inside contours
 
 		cv::drawContours(output, this->contours, i,
 						 cv::Scalar(0, 0, 255), 2, 8, this->hierarchy, 0);
