@@ -11,13 +11,20 @@
 class Cartographer
 {
 private:
-	Mat src;
-	Mat bordered;
+	cv::Mat src;
+	cv::Mat bordered;
+	std::vector<std::vector<cv::Point> > contours;
+	std::vector<cv::Vec4i> hierarchy;
+
 	void getBorder();
+	void shiftHueSpace  (cv::Mat *h, int const shift);
+	void extractContours(cv::Mat canny);
+	void binarization   (cv::Mat *img);
 
 public:
-	void setSrcImg(Mat src);
-	Mat getBordered();
+	cv::Mat getSrc     ()              { return this->src; };
+	cv::Mat getBordered(bool force);
+	void    setSrcImg  (cv::Mat _src);
 
 	Cartographer();
 	~Cartographer();
