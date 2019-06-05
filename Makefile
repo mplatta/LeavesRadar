@@ -4,7 +4,8 @@ CFLAGS	= -g -Wall
 SRC_DIR	= src/
 OUT_DIR = bin/
 
-SRCS	= src/main.cpp
+SRCS	= src/*.cpp
+# SRCS_H	= src/*.hpp
 PROG	= bin/mgr
 
 OPENCV	= `pkg-config opencv --cflags --libs`
