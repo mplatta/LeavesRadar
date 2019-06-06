@@ -22,7 +22,7 @@ public:
 	std::vector<cv::Point> getContour  ()           { return this->contour  ; };
 	cv::Point              getCenter   ()           { return this->center   ; };
 	/** if force is true, histogram always will be calculate from zero;
-		if false, function return historam without calculated
+		if false, function return histogram without calculation (if was calculate before)
 	*/
 	std::vector<double>    getHistogram(bool force);
 	// std::vector<double>    getHistogram()           { return this->histogram; };
