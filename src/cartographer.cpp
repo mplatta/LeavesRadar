@@ -103,7 +103,7 @@ cv::Mat Cartographer::getBordered(bool force)
 	return this->bordered;
 }
 
-Cartographer::Cartographer() 
-{
-	// this->bordered = NULL;
-}
+// Cartographer::Cartographer() 
+// {
+// 	// this->bordered = NULL;
+// }
