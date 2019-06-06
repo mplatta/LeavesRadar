@@ -11,7 +11,7 @@ void FoldingRule::createHistogram()
 {	
 	double max = 0.0;
 
-	if (histogram.size != 0) histogram.clear();
+	if (histogram.size() != 0) histogram.clear();
 
 	for (int i = 0; i < this->contour.size(); ++i)
 	{
