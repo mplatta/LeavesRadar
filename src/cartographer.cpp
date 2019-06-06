@@ -43,7 +43,7 @@ void Cartographer::getBorder()
 	// cv::dilate(img_bw, img_bw, cv::Mat());
 	this->extractContours(img_bw);
 	
-	/*------------FUNCTION TO EXTRACT KONTOURS FROM HSV-------------*/
+	/*------------FUNCTION TO EXTRACT CONTOURS FROM HSV-------------*/
 	// cv::Mat hsv;
 	// cv::Mat H, S, V;
 	// cv::Mat cannyH, cannyS;
