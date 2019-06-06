@@ -25,6 +25,8 @@ int main( int argc, char** argv )
 	imshow( "Display window", dst);
 	
 	waitKey(0);
+
+	delete cartographer;
 	
 	return 0;
 }
