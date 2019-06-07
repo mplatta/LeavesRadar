@@ -29,7 +29,7 @@ public:
 
 	// setters
 	void setContour( std::vector<cv::Point> _contour);
-	void setCenter ( cv::Point               _center );
+	void setCenter ( cv::Point              _center );
 
 	// unnecessary
 	// inline static float distance(cv::Point a, cv::Point b) { return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2)); };
