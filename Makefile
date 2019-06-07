@@ -11,10 +11,12 @@ PROG	= bin/mgr
 OPENCV	= `pkg-config opencv --cflags --libs`
 LIBS	= $(OPENCV)
 
-MKDIR_P	= mkdir -p
+DEBUG	?= 0;
+ifneq ($(DEBUG), 0)
+	CFLAGS += -DDEBUG
+endif
 
-# ${OUT_DIR}:
-# 	${MKDIR_P} ${OUT_DIR}
+MKDIR_P	= mkdir -p
 
 $(PROG):$(SRCS)
 	${MKDIR_P} ${OUT_DIR}

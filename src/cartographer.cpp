@@ -3,6 +3,7 @@
 /* ------------ PRIVATE FUNCTIONS ------------*/
 void Cartographer::shiftHueSpace(cv::Mat *h, int const shift)
 {
+	formatted_log("Start shifting hue space by: %d", shift);
 	cv::Mat h_tmp = *h;
 	int cv_shift = shift / 2;	// open cv have hue values from 0 to 180 (cast from 0 to 360)
 
@@ -20,12 +21,14 @@ void Cartographer::shiftHueSpace(cv::Mat *h, int const shift)
 
 void Cartographer::extractContours(cv::Mat canny) 
 {
+	formatted_log("Start extract contours");
 	cv::findContours(canny, this->contours, this->hierarchy,
 					 CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
 }
 
 void Cartographer::binarization(cv::Mat *img) 
 {
+	formatted_log("Start binarization image");
 	cv::Mat im_gray;
 	cv::cvtColor(*img, im_gray, CV_RGB2GRAY);
 	cv::threshold(im_gray, *img, 200.0, 255.0, CV_THRESH_BINARY);
@@ -87,7 +90,7 @@ void Cartographer::setSrcImg(cv::Mat _src)
 	//TODO: add some allert
 	if (_src.empty()) 
 	{
-		std::cout << "dupa" << std::endl;
+		formatted_err("Image not exist");
 
 		return;
 	}

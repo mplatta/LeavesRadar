@@ -5,9 +5,10 @@ using namespace cv;
 
 int main( int argc, char** argv ) 
 {
-	formatted_log("adsadasdas %d", 12);
-	formatted_err("adsadasdas %d", 12);
-	// LOG("aaaaaaa%d", 33);
+	// for tests
+	formatted_log("aaa%d", 2);
+	formatted_log("aaa");
+
 	Cartographer *cartographer = new Cartographer();
 
 	Mat image, src_gray;
