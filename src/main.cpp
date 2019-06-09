@@ -18,8 +18,7 @@ int main( int argc, char** argv )
 
 	if(image.empty()) 
 	{
-		formatted_err("Could not open or find the image");
-		
+		std::cout <<  "Could not open or find the image" << std::endl;
 		return -1;
 	}
 
