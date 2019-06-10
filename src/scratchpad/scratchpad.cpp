@@ -9,6 +9,7 @@ using namespace cv;
 
 int main( int argc, char** argv ) 
 {
+	formatted_log("Place for your fun! :*");
 	
 	return 0;
 }
