@@ -1,4 +1,3 @@
-
 PROG	= bin/mgr
 SCRATCH	= bin/scratchpad
 CXX		= g++
