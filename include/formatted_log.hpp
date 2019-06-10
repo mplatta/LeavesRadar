@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 // TODO: make more generic
 inline char* cutFileName(char *txt) 
