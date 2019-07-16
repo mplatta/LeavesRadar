@@ -26,7 +26,8 @@ void FoldingRule::createHistogram()
 		histogram.push_back(tmp);
 	}
 
-	// divid 2
+	// div by 2
+	// ..
 
 	this->scaling(0.0, max);
 }
@@ -54,7 +55,6 @@ cv::Point FoldingRule::rotatePoint(cv::Point rotated, cv::Point center, double a
 
 	return r;
 }
-
 
 std::vector<double> FoldingRule::getHistogram(bool force) 
 {
