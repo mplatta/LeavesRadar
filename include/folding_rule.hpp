@@ -2,20 +2,28 @@
 #define _FOLDING_RULE_H_
 
 #include "opencv_headers.hpp"
+#include "formatted_log.hpp"
+#include "straight.hpp"
 
 class FoldingRule
 {
 private:
-	std::vector<cv::Point> contour  ;
-	cv::Point              center   ;
+	std::vector<cv::Point>              contour           ;
+	// std::vector<std::vector<cv Point> > segregated_contour;
+	cv::Point                           center            ;
 	/** array of distances between point zero and contour points
 		in 0-1 interval 	
 	*/
 	std::vector<double>    histogram;
 
 	//scaling distance to 0-1 interval and save to histogram
-	void scaling        (double min, double max);
-	void createHistogram()                      ;
+	void scaling            ( double min , double max )                           ;
+	void createHistogram    ( )                                                   ;
+	/**
+		isCrosing return pointer cv::Point if two lines intersect, 
+		if not return NULL pointer
+	*/
+	cv::Point *isIntersect	( cv::Point A, cv::Point B, cv::Point C, cv::Point D );
 
 public:
 	// getters
@@ -28,8 +36,8 @@ public:
 	// std::vector<double>    getHistogram()           { return this->histogram; };
 
 	// setters
-	void setContour( std::vector<cv::Point> _contour);
-	void setCenter ( cv::Point              _center );
+	void setContour   ( std::vector<cv::Point> _contour );
+	void setCenter    ( cv::Point              _center  );
 
 	// unnecessary
 	// inline static float distance(cv::Point a, cv::Point b) { return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2)); };
