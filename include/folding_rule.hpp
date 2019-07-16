@@ -17,16 +17,17 @@ private:
 	std::vector<double>    histogram;
 
 	//scaling distance to 0-1 interval and save to histogram
-	void scaling            ( double min , double max )                           ;
+	void scaling            ( double min, double max )                           ;
 	void createHistogram    ( )                                                   ;
 	/**
 		isCrosing return pointer cv::Point if two lines intersect, 
 		if not return NULL pointer
 	*/
-	cv::Point *isIntersect	( cv::Point A, cv::Point B, cv::Point C, cv::Point D );
+	cv::Point *isIntersect	( cv::Point A      , cv::Point B     , cv::Point C , cv::Point D );
+	cv::Point rotatePoint   ( cv::Point rotated, cv::Point center, double angle );
 
 public:
-	// getters
+	/* -------------------------- GETTERS ------------------------ */
 	std::vector<cv::Point> getContour  ()           { return this->contour  ; };
 	cv::Point              getCenter   ()           { return this->center   ; };
 	/** if force is true, histogram always will be calculate from zero;
@@ -35,14 +36,14 @@ public:
 	std::vector<double>    getHistogram(bool force);
 	// std::vector<double>    getHistogram()           { return this->histogram; };
 
-	// setters
+	/* -------------------------- SETTERS ------------------------ */
 	void setContour   ( std::vector<cv::Point> _contour );
 	void setCenter    ( cv::Point              _center  );
 
 	// unnecessary
 	// inline static float distance(cv::Point a, cv::Point b) { return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2)); };
 	
-	// constructors/destructors
+	/* ------------------ CONSTRUCTORS/DESTRUCTORS --------------- */
 	FoldingRule (std::vector<cv::Point> _contour, cv::Point _center) { this->contour = _contour; this->center = _center; };
 	FoldingRule () {};
 	~FoldingRule() {};
