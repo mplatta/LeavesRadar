@@ -9,7 +9,7 @@ void FoldingRule::scaling(double min, double max)
 	}
 }
 
-void FoldingRule::createHistogram() 
+void FoldingRule::createHistogram(double angle) 
 {	
 	formatted_log("Creating histogram");
 
@@ -17,17 +17,35 @@ void FoldingRule::createHistogram()
 
 	if (histogram.size() != 0) histogram.clear();
 
-	for (int i = 0; i < this->contour.size(); ++i)
+	// for (int i = 0; i < this->contour.size(); ++i)
+	// {
+	// 	double tmp = cv::norm(this->contour[i] - this->center);
+
+	// 	if (tmp > max) max = tmp;
+
+	// 	histogram.push_back(tmp);
+	// }
+
+	cv::Point *p = new cv::Point();
+	cv::Point w = cv::Point(this->center.x, this->center.y + 100);
+
+	for (double i = 0.; i < 360.; i += angle)
 	{
-		double tmp = cv::norm(this->contour[i] - this->center);
+		double rad = (i * M_PI) / 180;
+		
+		w = this->rotatePoint(w, this->center, rad);
+		p = this->findIntersect(this->center, w);
 
-		if (tmp > max) max = tmp;
+		if (p) 
+		{
+			double tmp = cv::norm(*p - this->center);
+			
+			if (tmp > max) max = tmp;
 
-		histogram.push_back(tmp);
+			histogram.push_back(tmp);
+		}
+		else histogram.push_back(0.0);	
 	}
-
-	// div by 2
-	// ..
 
 	this->scaling(0.0, max);
 }
@@ -44,8 +62,8 @@ cv::Point *FoldingRule::isIntersect(cv::Point A, cv::Point B, cv::Point C, cv::P
 
 	if (!p) return NULL;
 
-	if ( min(C.x, D.x) <= p->x && p->x <= max(C.x, D.x) && 
-		 min(C.y, D.y) <= p->y && p->y <= max(C.y, D.y) )
+	if ( std::min(C.x, D.x) <= p->x && p->x <= std::max(C.x, D.x) && 
+		 std::min(C.y, D.y) <= p->y && p->y <= std::max(C.y, D.y) )
 		return p;
 
 	formatted_log("Point is not in line segment!");
@@ -53,7 +71,7 @@ cv::Point *FoldingRule::isIntersect(cv::Point A, cv::Point B, cv::Point C, cv::P
 	return NULL; 
 }
 
-cv::Point FoldingRule::findIntersect(cv::Point A, cv::Point B) 
+cv::Point *FoldingRule::findIntersect(cv::Point A, cv::Point B) 
 {
 	// brute force temporarily
 	cv::Point *p = new cv::Point();
@@ -65,7 +83,7 @@ cv::Point FoldingRule::findIntersect(cv::Point A, cv::Point B)
 
 		p = this->isIntersect(A, B, this->contour[c], this->contour[d]);
 
-		if (p) return p
+		if (p) return p;
 	}
 
 	delete p;
@@ -87,10 +105,10 @@ cv::Point FoldingRule::rotatePoint(cv::Point rotated, cv::Point center, double a
 	return r;
 }
 
-std::vector<double> FoldingRule::getHistogram(bool force) 
+std::vector<double> FoldingRule::getHistogram(double angle, bool force) 
 {
 	if (force || this->histogram.size() == 0) 
-		this->createHistogram();
+		this->createHistogram(angle);
 
 	return this->histogram;
 }

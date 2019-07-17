@@ -25,8 +25,6 @@ static cv::Point  *isIntersectStright_t    ( straight_t A, straight_t B );
 
 static straight_t createStraightFrom2Point(cv::Point A, cv::Point B)
 {	
-	formatted_log("Createing straight");
-
 	double a, b;
 
 	a = B.y - A.y;
