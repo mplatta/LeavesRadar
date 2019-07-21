@@ -28,6 +28,12 @@ static bool dirExists(const char *path)
 	return false;
 }
 
+void *testT(void *a)
+{
+	printf("hello");
+	pthread_exit(NULL);
+}
+
 int main( int argc, char** argv ) 
 {
 	pthread_t threads[NUM_THREADS];
@@ -93,5 +99,12 @@ int main( int argc, char** argv )
 
 	}
 	
+	for ( int i = 0; i < NUM_THREADS; ++i)
+	{
+		int rc = pthread_create(&threads[i], NULL, testT, NULL);
+	}
+
+	pthread_exit(NULL);
+
 	return 0;
 }
