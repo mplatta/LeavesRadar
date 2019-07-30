@@ -28,10 +28,10 @@ static bool dirExists(const char *path)
 	return false;
 }
 
-void *worker(void *a)
+void *worker_func(void *a)
 {
 	printf("hello");
-	
+
 	pthread_exit(NULL);
 }
 
@@ -102,7 +102,7 @@ int main( int argc, char** argv )
 	
 	for ( int i = 0; i < NUM_THREADS; ++i)
 	{
-		int rc = pthread_create(&threads[i], NULL, testT, (void *)NULL);
+		int rc = pthread_create(&threads[i], NULL, worker_func, (void *)NULL);
 	}
 
 	return 0;
