@@ -28,9 +28,10 @@ static bool dirExists(const char *path)
 	return false;
 }
 
-void *testT(void *a)
+void *worker(void *a)
 {
 	printf("hello");
+	
 	pthread_exit(NULL);
 }
 
@@ -78,7 +79,7 @@ int main( int argc, char** argv )
 		namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
 
 		imshow( "Display window", dst);
-	
+		
 		waitKey(0);
 
 		delete cartographer;
@@ -101,10 +102,8 @@ int main( int argc, char** argv )
 	
 	for ( int i = 0; i < NUM_THREADS; ++i)
 	{
-		int rc = pthread_create(&threads[i], NULL, testT, NULL);
+		int rc = pthread_create(&threads[i], NULL, testT, (void *)NULL);
 	}
-
-	pthread_exit(NULL);
 
 	return 0;
 }
