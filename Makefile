@@ -1,7 +1,7 @@
 PROG	= bin/mgr
 SCRATCH	= bin/scratchpad
 CXX		= g++
-OPTS	= -g -Wall
+OPTS	= -std=c++11 -g -Wall
 CFLAGS	= $(OPTS)
 
 INCDIR	= ./include
@@ -20,7 +20,7 @@ SRC_SCR  += ./src/scratchpad/scratchpad.cpp
 # OBJ		= $(patsubst %,$(OBJDIR)/%,$(_OBJ))
 
 OPENCV	= `pkg-config opencv --cflags --libs`
-LIBS	= $(OPENCV)
+LIBS	= -lpthread $(OPENCV)
 
 OUT_DIR = bin/
 MKDIR_P	= mkdir -p
