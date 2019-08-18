@@ -71,11 +71,14 @@ void Cartographer::getBorder()
 	// this->extractContours(cannyH);
 	/*------------------------------------------------------------*/
 
+	// TODO: change to one contour and delete drawing
 	// draw contours to source img
 	for(int i = 0; i < this->contours.size(); ++i)
 	{
 		if (cv::contourArea(contours[i]) < 400) continue;	// ignore area smaller than 400
 		if (hierarchy[i][3] < 0) continue; 					// ignore inside contours
+
+		formatted_err("TUUUUUUUUU");
 
 		cv::drawContours(output, this->contours, i,
 						 cv::Scalar(0, 0, 255), 2, 8, this->hierarchy, 0);
@@ -85,6 +88,14 @@ void Cartographer::getBorder()
 }
 
 /* ------------ PUBLIC FUNTIONS ------------*/
+
+void Cartographer::makeBorder(bool force)
+{
+	if (this->bordered.empty() || force) {	
+		this->getBorder();
+	}
+}
+
 void Cartographer::setSrcImg(cv::Mat _src) 
 {
 	//TODO: add some allert
