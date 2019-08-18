@@ -5,10 +5,13 @@
 
 #include "cartographer.hpp"
 #include "formatted_log.hpp"
+#include "thread_pool.hpp"
+// #include "TSafeQueue.hpp"
+// #include "store_queue.hpp"
 
 using namespace cv;
 
-#define NUM_THREADS 4
+// #define NUM_THREADS std::thread::hardware_concurrency()
 
 static bool dirExists(const char *path)
 {
@@ -28,16 +31,10 @@ static bool dirExists(const char *path)
 	return false;
 }
 
-void *worker_func(void *a)
-{
-	printf("hello");
-
-	pthread_exit(NULL);
-}
-
 int main( int argc, char** argv ) 
 {
-	pthread_t threads[NUM_THREADS];
+	ThreadPool *pool = new ThreadPool();
+
 	string file = "";
 
 	if (argc > 1) 
@@ -95,15 +92,12 @@ int main( int argc, char** argv )
 			for (size_t i = 0; i < image_names.size(); ++i)
 			{
 				printf("%s\n", image_names[i].c_str());
+				pool->getSQueue()->push( { NULL, &image_names[i], NULL } );
+				// sQueue->push({&cartographer_worker, &image_names[i]});
 			}
 		}
 
 	}
 	
-	for ( int i = 0; i < NUM_THREADS; ++i)
-	{
-		int rc = pthread_create(&threads[i], NULL, worker_func, (void *)NULL);
-	}
-
 	return 0;
 }

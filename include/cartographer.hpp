@@ -22,6 +22,8 @@ private:
 	void binarization   (cv::Mat *img );
 
 public:
+	void                                 makeBorder  ( bool force );
+
 	// getters
 	cv::Mat                              getSrc      ()              { return this->src;      };
 	cv::Mat                              getBordered ( bool force );
