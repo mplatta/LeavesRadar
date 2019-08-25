@@ -71,14 +71,28 @@ void Cartographer::getBorder()
 	// this->extractContours(cannyH);
 	/*------------------------------------------------------------*/
 
+	// tmp solution:
+	double ar = 0.0;
+	int index;
+
+	for(int i = 0; i < this->contours.size(); ++i)
+	{
+		if (cv::contourArea(contours[i]) > ar)
+		{
+			ar = cv::contourArea(contours[i]);
+			index = i;
+		}
+	}
+
+	this->contour = this->contours[index];
+
 	// TODO: change to one contour and delete drawing
 	// draw contours to source img
+
 	for(int i = 0; i < this->contours.size(); ++i)
 	{
 		if (cv::contourArea(contours[i]) < 400) continue;	// ignore area smaller than 400
 		if (hierarchy[i][3] < 0) continue; 					// ignore inside contours
-
-		formatted_err("TUUUUUUUUU");
 
 		cv::drawContours(output, this->contours, i,
 						 cv::Scalar(0, 0, 255), 2, 8, this->hierarchy, 0);

@@ -92,9 +92,26 @@ int main( int argc, char** argv )
 			for (size_t i = 0; i < image_names.size(); ++i)
 			{
 				printf("%s\n", image_names[i].c_str());
+
+
+				// cv::Point p_z = cv::Point(0, 0);
+
+				// Cartographer *cartographer = new Cartographer();
+				// // std::string *path_ = (std::string *)path;
+
+				// cv::Mat image = cv::imread(image_names[i], CV_LOAD_IMAGE_COLOR);
+				// cartographer->setSrcImg(image);
+				// cartographer->makeBorder(false);
+				
+				// std::vector<cv::Point> c = cartographer->getContour();
+				// // formatted_log("Add %s to foldingRule", (*path_).c_str());
+
+				// pool->getSQueue()->push( { NULL, &c, &p_z } );
 				pool->getSQueue()->push( { NULL, &image_names[i], NULL } );
 				// sQueue->push({&cartographer_worker, &image_names[i]});
 			}
+
+			pool->start();
 		}
 
 	}

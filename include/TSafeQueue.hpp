@@ -19,9 +19,14 @@ public:
 	{
 		std::unique_lock<std::mutex> mlock(mutex_);
 
+		int flag = 0;
+
 		while (queue_.empty())
 		{
 			cond_.wait(mlock);
+			flag++;
+
+			if (flag >= 4) break;
 		}
 
 		auto item = queue_.front();
@@ -34,9 +39,14 @@ public:
 	{
 		std::unique_lock<std::mutex> mlock(mutex_);
 
+		int flag = 0;
+
 		while (queue_.empty())
 	 	{
 			cond_.wait(mlock);
+			flag++;
+
+			if (flag >= 4) break;
 		}
 
 		item = queue_.front();
@@ -57,6 +67,16 @@ public:
 		queue_.push(std::move(item));
 		mlock.unlock();
 		cond_.notify_one();
+	}
+
+	bool empty()
+	{
+		return queue_.empty();
+	}
+
+	int size()
+	{
+		return queue_.size();
 	}
 };
 

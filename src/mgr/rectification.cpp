@@ -73,24 +73,24 @@ cv::Point2f Rectification::getPointOnStraightX(double x){
 
 cv::Mat Rectification::straightenImg(){
 	cv::Mat dst;
-	this->computeAngle();
+	// this->computeAngle();
 
 
-    //Rotation and translation
-    cv::Point2f center(this->img.cols / 2.0, this->img.rows / 2.0);
+ //    //Rotation and translation
+ //    cv::Point2f center(this->img.cols / 2.0, this->img.rows / 2.0);
 
-    cv::Mat rotation_matrix = getRotationMatrix2D(center, this->angle, 1);
+ //    cv::Mat rotation_matrix = getRotationMatrix2D(center, this->angle, 1);
 
-    cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), this->img.size(), this->angle).boundingRect2f();  
+ //    cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), this->img.size(), this->angle).boundingRect2f();  
 
-    this->translationX = bbox.width / 2.0 - center.x;
-    this->translationY = bbox.height / 2.0 - center.y;  
+ //    this->translationX = bbox.width / 2.0 - center.x;
+ //    this->translationY = bbox.height / 2.0 - center.y;  
 
-    rotation_matrix.at<double>(0,2) += this->translationX;
-    rotation_matrix.at<double>(1,2) += this->translationY;
+ //    rotation_matrix.at<double>(0,2) += this->translationX;
+ //    rotation_matrix.at<double>(1,2) += this->translationY;
 
-    //Rotating image
-    warpAffine(this->img, dst, rotation_matrix, bbox.size());
+ //    //Rotating image
+ //    warpAffine(this->img, dst, rotation_matrix, bbox.size());
 
     return dst;
 }
