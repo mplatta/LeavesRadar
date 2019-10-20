@@ -6,9 +6,10 @@
 
 typedef struct Store_queue
 {
-	void (*func)(void *, void *);
+	void (*func)(void *, void *, void *);
 	void *fir_data;
 	void *sec_data;
+	void *thr_data;
 } store_queue;
 
 #endif
