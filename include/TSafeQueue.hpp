@@ -22,12 +22,24 @@ public:
 	{
 		return queue_;
 	}
+	// --------
 
 	T getItem(int i) 
 	{
+		std::unique_lock<std::mutex> mlock(mutex_);
+
+		int flag = 0;
+
+		while (queue_.empty())
+		{
+			cond_.wait(mlock);
+			flag++;
+
+			if (flag >= 4) break;
+		}	
+
 		return queue_[i];
 	}
-	// --------
 
 	T pop()
 	{

@@ -67,7 +67,23 @@ void ThreadPool::folding_rule_worker(void *contour, void *size, void *point_zero
 	// cv::Point *contour_ = (cv::Point *)contour;
 	// cv::Point *point = (cv::Point *)point_zero;
 
-	int *i = (int *)contour;
+	Entity e;
+	int index = -1;
+	
+	std::string *path_ = (std::string *)contour;
+
+
+	for (size_t i = 0; i < entities->size(); i++) {
+		if (ThreadPool::entities->getItem(i).isThisEntity(*path_)) 
+		{
+			e = ThreadPool::entities->getItem(i);
+			break;
+		}
+	}
+
+	if (index == -1) {
+		formatted_err("KUPA");
+	}
 
 	// std::vector<cv::Point> vec_contour;
 	// formatted_log("sfdsfsdfsfsdfsdfdfsdfsd");
@@ -75,13 +91,13 @@ void ThreadPool::folding_rule_worker(void *contour, void *size, void *point_zero
 
 	// formatted_log("DDDDDD: %d", (*contour_).x);
 
-	// FoldingRule *foldingRule = new FoldingRule();
+	FoldingRule *foldingRule = new FoldingRule();
 
-	// foldingRule->setContour(vec_contour);
-	// foldingRule->setCenter(cv::Point(0,0));
+	foldingRule->setContour(e.getContour());
+	foldingRule->setCenter(cv::Point(0,0));
 
-	// std::vector<double> histogram = foldingRule->getHistogram(0.5, false);
-	formatted_log("SSSSSSSSSSSSSSSSS %d", *i);
+	std::vector<double> histogram = foldingRule->getHistogram(0.5, false);
+	formatted_log("SSSSSSSSSSSSSSSSS %s", (*path_).c_str());
 	// TODO: save histogram in file
 
 	formatted_log("End foldingRule");
@@ -114,19 +130,19 @@ void ThreadPool::cartographer_worker(void *path, void *not_use, void *not_use_2)
 
 	// TSafeQueue<Entity> q = (TSafeQueue<Entity>)entities->getQueue();
 
-	int index = -1;
+	// int index = -1;
 
-	for (size_t i = 0; i < entities->size(); i++) {
-		if (ThreadPool::entities->getItem(i).isThisEntity(*path_)) 
-		{
-			index = i;
-			break;
-		}
-	}
+	// for (size_t i = 0; i < entities->size(); i++) {
+	// 	if (ThreadPool::entities->getItem(i).isThisEntity(*path_)) 
+	// 	{
+	// 		index = i;
+	// 		break;
+	// 	}
+	// }
 
-	if (index == -1) {
-		formatted_err("KUPA");
-	}
+	// if (index == -1) {
+	// 	formatted_err("KUPA");
+	// }
 	// std::vector<cv::Point> c = cartographer->getContour();
 	// size = c.size();
 	// memcpy( arr_contour, &c[0], sizeof( cv::Point ) * size );
@@ -136,7 +152,7 @@ void ThreadPool::cartographer_worker(void *path, void *not_use, void *not_use_2)
 	// formatted_log("AddC %d to foldingRule", arr_contour[0].x);
 	// formatted_log("AddC %d to foldingRule", p_z.x);
 
-	ThreadPool::sQueue->push( { ThreadPool::folding_rule_worker, &index, NULL, NULL } );
+	ThreadPool::sQueue->push( { ThreadPool::folding_rule_worker, path_, NULL, NULL } );
 
 	formatted_log("Queue size %d", sQueue->size());
 
