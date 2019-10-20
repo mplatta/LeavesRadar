@@ -20,17 +20,17 @@ void ThreadPool::worker(int id)
 			store_queue st = ThreadPool::sQueue->pop();
 			if (st.func != NULL && st.fir_data != NULL) 
 			{
-				st.func(st.fir_data, st.sec_data, st.thr_data);
+				st.func(st.fir_data, st.sec_data);
 			}
 			else if (st.func == NULL && st.fir_data != NULL)
 			{
 				// ThreadPool::folding_rule_worker(st.fir_data, st.sec_data);
-				ThreadPool::cartographer_worker(st.fir_data, NULL, NULL);	
+				ThreadPool::cartographer_worker(st.fir_data, NULL);	
 			}
 		}
 		else 
 		{
-			formatted_log("sleep for %d", id);
+			// formatted_log("sleep for %d", id);
 			std::this_thread::sleep_for( std::chrono::milliseconds(500) ); 
 			flag++;
 		}
@@ -60,23 +60,18 @@ void ThreadPool::worker(int id)
 	} while (!ThreadPool::stop_flag);
 }
 
-void ThreadPool::folding_rule_worker(void *contour, void *size, void *point_zero)
+void ThreadPool::folding_rule_worker(void *path, void *not_use)
 {
-	// std::vector<cv::Point> *contour_ = (std::vector<cv::Point> *)contour;
-	// size_t *s = (size_t *)size;
-	// cv::Point *contour_ = (cv::Point *)contour;
-	// cv::Point *point = (cv::Point *)point_zero;
-
-	Entity e;
+	Entity *e;
 	int index = -1;
 	
-	std::string *path_ = (std::string *)contour;
+	std::string *path_ = (std::string *)path;
 
 
 	for (size_t i = 0; i < entities->size(); i++) {
-		if (ThreadPool::entities->getItem(i).isThisEntity(*path_)) 
+		if ((e = ThreadPool::entities->getItem(i).isThisEntityE(*path_)) != NULL ) 
 		{
-			e = ThreadPool::entities->getItem(i);
+			index = 0;
 			break;
 		}
 	}
@@ -85,31 +80,23 @@ void ThreadPool::folding_rule_worker(void *contour, void *size, void *point_zero
 		formatted_err("KUPA");
 	}
 
-	// std::vector<cv::Point> vec_contour;
-	// formatted_log("sfdsfsdfsfsdfsdfdfsdfsd");
-	// vec_contour.assign(contour_, contour_ + (750));
-
-	// formatted_log("DDDDDD: %d", (*contour_).x);
-
 	FoldingRule *foldingRule = new FoldingRule();
 
-	foldingRule->setContour(e.getContour());
+	foldingRule->setContour(e->getContour());
 	foldingRule->setCenter(cv::Point(0,0));
 
 	std::vector<double> histogram = foldingRule->getHistogram(0.5, false);
-	formatted_log("SSSSSSSSSSSSSSSSS %s", (*path_).c_str());
+
 	// TODO: save histogram in file
 
 	formatted_log("End foldingRule");
 
-	// delete contour_;
-	// delete foldingRule;
+	path_ = NULL;
+	delete foldingRule;
 	// delete point;
 }
 
-// std::vector<std::vector<cv::Point> > ThreadPool::cartographer_worker_non_static()
-
-void ThreadPool::cartographer_worker(void *path, void *not_use, void *not_use_2) 
+void ThreadPool::cartographer_worker(void *path, void *not_use) 
 {
 	// tmp
 	cv::Point p_z = cv::Point(0, 0);
@@ -127,34 +114,12 @@ void ThreadPool::cartographer_worker(void *path, void *not_use, void *not_use_2)
 	Entity *e = new Entity( (*path_), cartographer->getContour() );
 
 	ThreadPool::entities->push(*e);
-
-	// TSafeQueue<Entity> q = (TSafeQueue<Entity>)entities->getQueue();
-
-	// int index = -1;
-
-	// for (size_t i = 0; i < entities->size(); i++) {
-	// 	if (ThreadPool::entities->getItem(i).isThisEntity(*path_)) 
-	// 	{
-	// 		index = i;
-	// 		break;
-	// 	}
-	// }
-
-	// if (index == -1) {
-	// 	formatted_err("KUPA");
-	// }
-	// std::vector<cv::Point> c = cartographer->getContour();
-	// size = c.size();
-	// memcpy( arr_contour, &c[0], sizeof( cv::Point ) * size );
 	
 	formatted_log("Add %s to foldingRule", (*path_).c_str());
-	// formatted_log("AddS %d to foldingRule", size);
-	// formatted_log("AddC %d to foldingRule", arr_contour[0].x);
-	// formatted_log("AddC %d to foldingRule", p_z.x);
 
-	ThreadPool::sQueue->push( { ThreadPool::folding_rule_worker, path_, NULL, NULL } );
+	ThreadPool::sQueue->push( { ThreadPool::folding_rule_worker, path_, NULL } );
 
-	formatted_log("Queue size %d", sQueue->size());
+	// formatted_log("Queue size %d", sQueue->size());
 
 	cartographer = NULL;
 	path_ = NULL;

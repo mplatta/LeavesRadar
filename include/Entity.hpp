@@ -28,7 +28,8 @@ public:
 	void setHierarchy ( std::vector<cv::Vec4i> hierarchy ) { this->_hierarchy = hierarchy; };
 
 	// func
-	bool isThisEntity ( std::string name ); 
+	bool isThisEntity     ( std::string name ); 
+	Entity *isThisEntityE ( std::string name ); 
 
 	// constructors/destructors
 	Entity()  {};

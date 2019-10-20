@@ -22,9 +22,9 @@ private:
 	static bool stop_flag;
 	static bool	*stop_flags;
 	
-	static void worker              ( int   id                                       ) ;
-	static void folding_rule_worker ( void *contour, void *size   , void *point_zero ) ;
-	static void cartographer_worker ( void *path   , void *not_use, void *not_use_2  ) ;
+	static void worker              ( int   id                     ) ;
+	static void folding_rule_worker ( void *contour, void *size    ) ;
+	static void cartographer_worker ( void *path   , void *not_use ) ;
 	static void	set_starts_value	();
 
 public:

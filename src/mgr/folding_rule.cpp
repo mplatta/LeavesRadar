@@ -31,7 +31,6 @@ void FoldingRule::createHistogram(double angle)
 
 	for (double i = 0.; i < 360.; i += angle)
 	{
-		formatted_log("Creating histogram3 %f", i);
 		double rad = (i * M_PI) / 180;
 		
 		w = this->rotatePoint(w, this->center, rad);
