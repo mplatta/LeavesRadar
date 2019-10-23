@@ -112,3 +112,14 @@ std::vector<double> FoldingRule::getHistogram(double angle, bool force)
 
 	return this->histogram;
 }
+
+bool FoldingRule::saveHistogram(std::string path, int index) 
+{
+
+	ofstream file;
+
+	file.open("../")
+
+
+	file = fopen
+}

@@ -12,10 +12,11 @@
 class Entity
 {
 private:
-	std::string            _name;
-	std::vector<cv::Point> _contour;
+	std::string            _name     ;
+	std::vector<cv::Point> _contour  ;
 	std::vector<cv::Vec4i> _hierarchy;
 	cv::Point              _poit_zero;
+	int                    _index    ; 
 
 public:
 	// getters
@@ -23,12 +24,14 @@ public:
 	std::vector<cv::Point> getContour   () { return this->_contour;   };
 	std::vector<cv::Vec4i> getHierarchy () { return this->_hierarchy; };
 	cv::Point              getPointZero () { return this->_poit_zero; };
+	int                    getIndex     () { return this->_index;     };
 
 	// setters
-	void setName      ( std::string name                 ) { this->_name      = name;      };
-	void setContour   ( std::vector<cv::Point> contour   ) { this->_contour   = contour;   };
+	void setName      ( std::string name                 ) { this->_name      = name     ; };
+	void setContour   ( std::vector<cv::Point> contour   ) { this->_contour   = contour  ; };
 	void setHierarchy ( std::vector<cv::Vec4i> hierarchy ) { this->_hierarchy = hierarchy; };
 	void setPointZero ( cv::Point poit_zero              ) { this->_poit_zero = poit_zero; };
+	void setIndex     ( int index                        ) { this->_index     = index    ; };
 
 	// func
 	bool isThisEntity     ( std::string name ); 

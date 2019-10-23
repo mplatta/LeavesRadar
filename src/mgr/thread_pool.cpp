@@ -89,7 +89,7 @@ void ThreadPool::folding_rule_worker(void *path, void *not_use)
 
 	// TODO: save histogram in file
 
-	formatted_log("End foldingRule");
+	formatted_log("End foldingRule for %s", e->getName().c_str());
 
 	path_ = NULL;
 	delete foldingRule;

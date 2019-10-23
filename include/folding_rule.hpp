@@ -47,6 +47,8 @@ public:
 	void setContour   ( std::vector<cv::Point> _contour ) { this->contour = _contour; };
 	void setCenter    ( cv::Point              _center  ) { this->center  = _center ; };
 
+	// --------------------------- FUNC ---------------------------*/
+	bool saveHistogram(std::string path, int index);
 	// unnecessary
 	// inline static float distance(cv::Point a, cv::Point b) { return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2)); };
 	
