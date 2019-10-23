@@ -77,7 +77,7 @@ void ThreadPool::folding_rule_worker(void *path, void *not_use)
 	}
 
 	if (index == -1) {
-		formatted_err("KUPA");
+		formatted_err("SOMTHING IS NO YES");
 	}
 
 	FoldingRule *foldingRule = new FoldingRule();
