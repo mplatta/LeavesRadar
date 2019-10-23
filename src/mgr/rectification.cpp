@@ -75,13 +75,12 @@ cv::Mat Rectification::straightenImg(){
 	cv::Mat dst;
 	this->computeAngle();
 
-
     //Rotation and translation
     cv::Point2f center(this->img.cols / 2.0, this->img.rows / 2.0);
 
     cv::Mat rotation_matrix = getRotationMatrix2D(center, this->angle, 1);
 
-    cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), this->img.size(), this->angle).boundingRect2f();  
+    cv::Rect bbox = cv::RotatedRect(cv::Point2f(), this->img.size(), this->angle).boundingRect();  
 
     this->translationX = bbox.width / 2.0 - center.x;
     this->translationY = bbox.height / 2.0 - center.y;  

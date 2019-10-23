@@ -14,6 +14,7 @@ private:
 	cv::Mat src;
 	cv::Mat bordered;
 	std::vector<std::vector<cv::Point> > contours;
+	std::vector<cv::Point>				 contour;
 	std::vector<cv::Vec4i>               hierarchy;
 
 	void getBorder      ();
@@ -22,10 +23,13 @@ private:
 	void binarization   (cv::Mat *img );
 
 public:
+	void                                 makeBorder  ( bool force );
+
 	// getters
 	cv::Mat                              getSrc      ()              { return this->src;      };
 	cv::Mat                              getBordered ( bool force );
 	std::vector<std::vector<cv::Point> > getContours ()              { return this->contours; };
+	std::vector<cv::Point>				 getContour  ()				 { return this->contour;  };
 	std::vector<cv::Vec4i>               getHierarchy()              { return this->hierarchy;};
 	
 	// setters

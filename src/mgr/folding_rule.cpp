@@ -56,7 +56,7 @@ cv::Point *FoldingRule::isIntersect(cv::Point A, cv::Point B, cv::Point C, cv::P
 	straight_t a = createStraightFrom2Point(A, B);
 	straight_t b = createStraightFrom2Point(C, D);
 
-	formatted_log("Check intersecting");
+	// formatted_log("Check intersecting");
 
 	p = isIntersectStright_t(a, b);
 
@@ -66,7 +66,7 @@ cv::Point *FoldingRule::isIntersect(cv::Point A, cv::Point B, cv::Point C, cv::P
 		 std::min(C.y, D.y) <= p->y && p->y <= std::max(C.y, D.y) )
 		return p;
 
-	formatted_log("Point is not in line segment!");
+	// formatted_log("Point is not in line segment!");
 
 	return NULL; 
 }

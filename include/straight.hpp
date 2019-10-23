@@ -40,7 +40,7 @@ static cv::Point *isIntersectStright_t(straight_t A, straight_t B)
 
 	if (det == 0) 
 	{
-		formatted_log("Lines not intersecting");
+		// formatted_log("Lines not intersecting");
 
 		return NULL;
 	}
@@ -58,8 +58,8 @@ static cv::Point *isIntersectStright_t(straight_t A, straight_t B)
 	result -> x = x;
 	result -> y = y;
 
-	formatted_log("Lines intersecting in (double) (%f, %f)", x, y);
-	formatted_log("Lines intersecting in (int   ) (%d, %d)", (int)x, (int)y);
+	// formatted_log("Lines intersecting in (double) (%f, %f)", x, y);
+	// formatted_log("Lines intersecting in (int   ) (%d, %d)", (int)x, (int)y);
 
 	return result;
 }
