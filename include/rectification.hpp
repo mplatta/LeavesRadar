@@ -19,8 +19,6 @@ private:
 	double translationX = 0.0;
 	double translationY = 0.0;
 	
-	cv::Point2f getPointOnStraightY(double y);
-	cv::Point2f getPointOnStraightX(double x);
 	void computeAngle();
 
 public:
