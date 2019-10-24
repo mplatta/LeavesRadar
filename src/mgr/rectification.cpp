@@ -5,9 +5,9 @@ void Rectification::computeAngle(){
         return;
     }
     //Getting points on symmetry line
-    cv::Point2f first_point = this->getPointOnStraightY(this->img.rows);
+    cv::Point2f first_point = getPointOnStraightY(this->str, this->img.rows);
     // formatted_log("First point [%f, %f]", first_point.x, first_point.y);
-    cv::Point2f second_point = this->getPointOnStraightX(this->img.cols / 2.0);
+    cv::Point2f second_point = getPointOnStraightX(this->str, this->img.cols / 2.0);
     // formatted_log("Second point [%f, %f]", second_point.x, second_point.y);
 
     //Changing points to vectors
@@ -51,24 +51,6 @@ void Rectification::straightenPoint(cv::Point2f &p){
         p.x += this->translationX;
     if(this->translationY != 0.0)
         p.y += this->translationY;
-}
-
-cv::Point2f Rectification::getPointOnStraightY(double y){
-	// formatted_log("y = %f", y);
-	// formatted_log("A = %f, B = %f, C = %f", this->str.coeff.a, this->str.coeff.b, this->str.coeff.c);	
-	// formatted_log("x = %f", (this->str.coeff.c - this->str.coeff.b * y)/this->str.coeff.a);
-	cv::Point2f result(((this->str.coeff.c - this->str.coeff.b * y)/this->str.coeff.a), y);
-	// formatted_log("Point on straight [%f, %f]", result.x, result.y);
-	return result;
-}
-
-cv::Point2f Rectification::getPointOnStraightX(double x){
-	// formatted_log("x = %f", x);
-	// formatted_log("A = %f, B = %f, C = %f", this->str.coeff.a, this->str.coeff.b, this->str.coeff.c);	
-	// formatted_log("y = %f", (this->str.coeff.c - this->str.coeff.a * x)/this->str.coeff.b);
-	cv::Point2f result(x, ((this->str.coeff.c - this->str.coeff.a * x)/this->str.coeff.b));
-	// formatted_log("Point on straight [%f, %f]", result.x, result.y);
-	return result;
 }
 
 cv::Mat Rectification::straightenImg(){

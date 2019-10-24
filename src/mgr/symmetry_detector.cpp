@@ -117,7 +117,7 @@ pair<Point, Point> SymmetryDetector::getResult(Mat frame, float threshold ) {
     
     /* Adjustable parameters, depending on the scene condition */
     int canny_thresh_1 = 500;
-    int canny_thresh_2 = 500;
+    int canny_thresh_2 = 100;
     int min_pair_dist  = 25;
     int max_pair_dist  = 500;
     int no_of_peaks    = 1; 
