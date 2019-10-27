@@ -24,6 +24,8 @@ private:
 	static TSafeQueue<store_queue> *sQueue;
 	static TSafeQueue<Entity>      *entities;
 
+	static std::string _out_path;
+
 	static bool stop_flag;
 	static bool	*stop_flags;
 	
@@ -39,11 +41,14 @@ public:
 	static void stop ();
 
 	// getters/setters
-	static TSafeQueue<store_queue> *getSQueue() { return ThreadPool::sQueue; };
+	static TSafeQueue<store_queue> *getSQueue() { return ThreadPool::sQueue;    };
+	static std::string             getOutPath() { return ThreadPool::_out_path; };
+
+	static void setOutPath ( std::string out_path ) { ThreadPool::_out_path = out_path; };
 
 	ThreadPool()  { ThreadPool::stop_flag = false; ThreadPool::sQueue = new TSafeQueue<store_queue>();
 	                ThreadPool::entities = new TSafeQueue<Entity>(); stop_flags = new bool[NUM_THREADS];
-	                ThreadPool::set_starts_value(); };
+	                ThreadPool::set_starts_value(); ThreadPool::_out_path = "../out"; };
 	~ThreadPool() {};
 	
 };

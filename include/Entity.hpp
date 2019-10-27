@@ -3,8 +3,6 @@
 
 #include <iostream>
 #include <string>
-// #include <stdlib.h>
-// #include <stdio.h>
 
 #include "opencv_headers.hpp"
 #include "formatted_log.hpp"

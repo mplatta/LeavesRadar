@@ -7,7 +7,7 @@
 
 using namespace cv;
 
-void all_image_mode(string file, ThreadPool *pool, int flag) 
+void all_image_mode(std::string file, ThreadPool *pool) 
 {
 	std::vector<string> image_names;
 
@@ -30,7 +30,7 @@ void all_image_mode(string file, ThreadPool *pool, int flag)
 	}
 }
 
-void one_image_mode(string file, ThreadPool *pool, int flag) 
+void one_image_mode(string file, ThreadPool *pool) 
 {
 	formatted_inf("%s", file.c_str());
 	pool->getSQueue()->push( { NULL, &file, NULL } );
@@ -47,7 +47,8 @@ int main( int argc, char** argv )
 		2 - run program for one img
 	*/
 	int flag = 0;
-	string file = "";
+	std::string file = "";
+	std::string out_file = "";
 
 	if (argc > 1) 
 	{
@@ -70,7 +71,7 @@ int main( int argc, char** argv )
 			if ( (strcmp(argv[i], "--out") == 0 ) &&
 				 (argc >= i) )
 			{
-				file = argv[i + 1];
+				out_file = argv[i + 1];
 				flag = flag | 4;
 			}
 
@@ -87,12 +88,20 @@ int main( int argc, char** argv )
 	}
 	else 
 	{
+
+		if (!out_file.empty())
+		{
+			if (!dir_exists(out_file.c_str())) return -1;
+
+			pool->setOutPath(out_file);
+		}
+
 		switch(flag) {
-			case 1 :
-				all_image_mode(file, pool, flag);
+			case 1 : case 5:
+				all_image_mode(file, pool);
 				break;
-			case 2 :
-				one_image_mode(file, pool, flag);
+			case 2 : case 6:
+				one_image_mode(file, pool);
 				break;
 			default :
 				formatted_err("SOMTHING IS NO YES");

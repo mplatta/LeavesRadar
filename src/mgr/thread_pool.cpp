@@ -2,6 +2,7 @@
 
 TSafeQueue<store_queue> *ThreadPool::sQueue;
 TSafeQueue<Entity>      *ThreadPool::entities;
+std::string              ThreadPool::_out_path;
 bool					 ThreadPool::stop_flag;
 bool					*ThreadPool::stop_flags;
 
@@ -99,7 +100,12 @@ void ThreadPool::folding_rule_worker(void *path, void *not_use)
 
 	// formatted_log("File name: %s ( %d )", file_name.c_str(), id);
 
-	foldingRule->saveHistogram("..", file_name + "(" + std::to_string(id) + ")");
+	// formatted_err("%s", ThreadPool::_out_path);
+
+	std::string tmp = delete_last_slash(ThreadPool::_out_path);
+
+	foldingRule->saveHistogram( tmp, 
+		file_name + "(" + std::to_string(id) + ")" );
 
 	// formatted_log("End foldingRule");
 
@@ -162,11 +168,10 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 }
 
 // TODO dodaj opis co tu się dzieje
-void ThreadPool::symmetry_worker(void *path, void *out_path)
+void ThreadPool::symmetry_worker(void *path, void *not_use)
 {
 	cv::Mat tmp;
 	std::string *path_ = (std::string *)path;
-	std::string *out_path_ = (std::string *)out_path;
 	
 	formatted_log("Start symmetry_worker() for %s", (*path_).c_str());
 
@@ -178,12 +183,6 @@ void ThreadPool::symmetry_worker(void *path, void *out_path)
 
 		return;
 	}
-
-	// // TODO: wymyslic cos
-	// if ((*out_path_).empty()) 
-	// {
-	// 	;		
-	// }
 
 	float rho_divs   = hypotf( image.rows, image.cols ) + 1;
 	float theta_divs = 180.0;

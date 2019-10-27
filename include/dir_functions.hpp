@@ -7,8 +7,9 @@
 
 #include "formatted_log.hpp"
 
-static bool   dir_exists   (const  char *path);
-static std::string extract_name (std::string path      );
+static bool        dir_exists         ( const char  *path );
+static std::string delete_last_slash  ( std::string  path );
+static std::string extract_name       ( std::string  path );
 
 // ---------------- IMPLEMENTATION --------------------
 
@@ -28,6 +29,16 @@ static bool dir_exists(const char *path)
     	formatted_err( "%s is no directory", path );
 	
 	return false;
+}
+
+static std::string delete_last_slash(std::string path)
+{
+	if (path[path.length() - 1] == '/') 
+	{	
+		printf("%s\n", path.substr(0, path.length() - 1).c_str());
+		return path.substr(0, path.length() - 1);
+	}
+	else return path;
 }
 
 static std::string extract_name(std::string path)
