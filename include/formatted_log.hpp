@@ -24,12 +24,12 @@ inline char* cutFileName(char *txt)
 	while(0)
 
 #define formatted_err(msg, ...) \
-	do {if (!DNDEBUG) fprintf(stderr, "\x1B[31mERR: \033[0m%s[%d] (%s): " msg "\n", \
+	do {fprintf(stderr, "\x1B[31mERR: \033[0m%s[%d] (%s): " msg "\n", \
 		cutFileName(__FILE__), __LINE__, __func__, ##__VA_ARGS__); } \
 	while(0)
 
 #define formatted_inf(msg, ...) \
-	do {fprintf(stderr, "\x1B[34mINF: \033[0m: " msg "\n", ##__VA_ARGS__); } \
+	do {fprintf(stderr, "\x1B[34mINF: \033[0m" msg "\n", ##__VA_ARGS__); } \
 	while(0)
 
 #endif
