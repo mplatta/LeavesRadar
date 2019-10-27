@@ -82,9 +82,9 @@ int main( int argc, char** argv )
 		}
 	}
 
-	if (flag == -1)
+	if (flag == 0)
 	{
-		formatted_inf("RUN PROGRAM COMMAND:\nRun all image mode: ./mgr --path ../dir/\nRun one image mode: ./mgr --file ../dir/image.jpg");
+		formatted_inf("RUN PROGRAM COMMAND:\nRun all image mode: ./mgr --path ../dir/ [--out] [/path/to/out/dir]\nRun one image mode: ./mgr --file ../dir/image.jpg [--out] [/path/to/out/dir]");
 	}
 	else 
 	{
