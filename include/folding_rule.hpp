@@ -1,6 +1,8 @@
 #ifndef _FOLDING_RULE_H_
 #define _FOLDING_RULE_H_
 
+#include <fstream>
+
 #include "opencv_headers.hpp"
 #include "formatted_log.hpp"
 #include "constants.hpp"

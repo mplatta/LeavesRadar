@@ -116,7 +116,7 @@ std::vector<double> FoldingRule::getHistogram(double angle, bool force)
 bool FoldingRule::saveHistogram(std::string path, int index) 
 {
 
-	// ofstream file;
+	std::fstream file;
 
 	// file.open("../")
 
