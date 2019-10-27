@@ -28,7 +28,7 @@ void Rectification::computeAngle(){
     // formatted_log("angle = %f", this->angle);    
 }
 
-void Rectification::straightenPoint(cv::Point2f &p){
+cv::Point2f Rectification::straightenPoint(cv::Point2f p){
     this->computeAngle();
 
     // formatted_log("angle = %f", this->angle);
@@ -51,11 +51,13 @@ void Rectification::straightenPoint(cv::Point2f &p){
         p.x += this->translationX;
     if(this->translationY != 0.0)
         p.y += this->translationY;
+
+    return p;
 }
 
 cv::Mat Rectification::straightenImg(){
-	cv::Mat dst;
-	this->computeAngle();
+    cv::Mat dst;
+    this->computeAngle();
 
     //Rotation and translation
     cv::Point2f center(this->img.cols / 2.0, this->img.rows / 2.0);
@@ -74,4 +76,15 @@ cv::Mat Rectification::straightenImg(){
     warpAffine(this->img, dst, rotation_matrix, bbox.size());
 
     return dst;
+}
+
+void Rectification::computingTranslation(){
+    this->computeAngle();
+    
+    cv::Point2f center(this->img.cols / 2.0, this->img.rows / 2.0);
+
+    cv::Rect bbox = cv::RotatedRect(cv::Point2f(), this->img.size(), this->angle).boundingRect();  
+
+    this->translationX = bbox.width / 2.0 - center.x;
+    this->translationY = bbox.height / 2.0 - center.y; 
 }
