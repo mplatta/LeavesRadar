@@ -27,20 +27,65 @@ static bool dirExists(const char *path)
 	return false;
 }
 
+void all_image_mode(string file, ThreadPool *pool) 
+{
+	std::vector<string> image_names;
+
+	if (dirExists(file.c_str()))
+	{
+		glob(file + "/*.jpg", image_names);
+
+		for (size_t i = 0; i < image_names.size(); ++i)
+		{
+			formatted_inf("Add file to queue: %s", image_names[i].c_str());
+			pool->getSQueue()->push( { NULL, &image_names[i], NULL } );
+		}
+
+		formatted_inf("WORKING");
+		pool->start();
+	} 
+	else 
+	{
+		formatted_err("Direction: \"%s\" not exists", file.c_str());
+	}
+}
+
+void one_image_mode(string file, ThreadPool *pool) 
+{
+	formatted_inf("%s", file.c_str());
+	pool->getSQueue()->push( { NULL, &file, NULL } );
+	formatted_inf("WORKING");
+	pool->start();
+}
+
 int main( int argc, char** argv ) 
 {
 	ThreadPool *pool = new ThreadPool();
 
+	/*	type of start program
+		0 - run program for all img in dir
+		1 - run program for one img
+	*/
+	int flag = -1;
 	string file = "";
 
 	if (argc > 1) 
 	{
 		for (int i = 0; i < argc; ++i) 
 		{
-			if ( (strcmp(argv[i], "--file") == 0 ) &&
-				 (argc >= i + 1 ) )
+			if ( (strcmp(argv[i], "--path") == 0 ) &&
+				 (argc >= i) && (flag != 1) )
 			{
 				file = argv[i + 1];
+				flag = 0;
+				formatted_inf("All image mode");
+			}
+			if ( (strcmp(argv[i], "--file") == 0 ) &&
+				 (argc >= i) && (flag != 0) )
+			{
+				file = argv[i + 1];
+				flag = 1;
+				formatted_inf("One image mode");
 			}
 
 			if ( strcmp(argv[i], "-g") ) {
@@ -51,49 +96,22 @@ int main( int argc, char** argv )
 	}
 
 	// tmp
-	if (file == "")
+	if (flag == -1)
 	{
-		Cartographer *cartographer = new Cartographer();
-
-		Mat image, src_gray;
-		Mat dst, detected_edges;
-
-		image = imread("../res/oak.jpg", CV_LOAD_IMAGE_COLOR);
-
-		if(image.empty()) 
-		{
-			std::cout <<  "Could not open or find the image" << std::endl;
-			return -1;
-		}
-
-		cartographer->setSrcImg(image);
-		dst = cartographer->getBordered(false);
-
-		namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
-
-		imshow( "Display window", dst);
-		
-		waitKey(0);
-
-		delete cartographer;
+		formatted_inf("RUN PROGRAM COMMAND:\nRun all image mode: ./mgr --path ../dir/\nRun one image mode: ./mgr --file ../dir/image.jpg");
 	}
 	else 
 	{
-		std::vector<string> image_names;
-
-		if (dirExists(file.c_str()))
-		{
-			glob(file + "/*.jpg", image_names);
-
-			for (size_t i = 0; i < image_names.size(); ++i)
-			{
-				formatted_inf("%s\n", image_names[i].c_str());
-				pool->getSQueue()->push( { NULL, &image_names[i], NULL } );
-			}
-
-			pool->start();
+		switch(flag) {
+			case 0 :
+				all_image_mode(file, pool);
+				break;
+			case 1 :
+				one_image_mode(file, pool);
+				break;
+			default :
+				formatted_err("SOMTHING IS NO YES");
 		}
-
 	}
 	
 	formatted_inf("PROGRAM EXECUTED");

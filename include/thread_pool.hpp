@@ -10,6 +10,10 @@
 #include "folding_rule.hpp"
 #include "Entity.hpp"
 #include "formatted_log.hpp"
+#include "rectification.hpp"
+#include "symmetry_detector.hpp"
+#include "straight.hpp"
+#include "starting_point.hpp"
 
 #define NUM_THREADS std::thread::hardware_concurrency()
 
@@ -25,6 +29,8 @@ private:
 	static void worker              ( int   id                     ) ;
 	static void folding_rule_worker ( void *contour, void *size    ) ;
 	static void cartographer_worker ( void *path   , void *not_use ) ;
+	static void symmetry_worker     ( void *path   , void *not_use ) ;
+
 	static void	set_starts_value	();
 
 public:

@@ -17,6 +17,7 @@ void ThreadPool::worker(int id)
 		{
 			flag = 0;
 
+			formatted_inf("QUEUE size: %d", sQueue->size());
 			store_queue st = ThreadPool::sQueue->pop();
 			if (st.func != NULL && st.fir_data != NULL) 
 			{
@@ -24,14 +25,16 @@ void ThreadPool::worker(int id)
 			}
 			else if (st.func == NULL && st.fir_data != NULL)
 			{
-				// ThreadPool::folding_rule_worker(st.fir_data, st.sec_data);
-				ThreadPool::cartographer_worker(st.fir_data, NULL);	
+				// if first data is empty, start first worker func
+				ThreadPool::symmetry_worker(st.fir_data, st.sec_data);	
 			}
 		}
 		else 
 		{
-			// formatted_log("sleep for %d", id);
-			std::this_thread::sleep_for( std::chrono::milliseconds(500) ); 
+			// threads wait 500ms 4 times, after it they stopped  
+			// flag - is variable to count times of waiting
+			formatted_inf("Waiting for new job...");
+			std::this_thread::sleep_for( std::chrono::milliseconds(500) );
 			flag++;
 		}
 		
@@ -63,70 +66,127 @@ void ThreadPool::worker(int id)
 void ThreadPool::folding_rule_worker(void *path, void *not_use)
 {
 	Entity *e;
-	int index = -1;
 	
 	std::string *path_ = (std::string *)path;
-
+	formatted_log("Start folding_rule_workerl() for %s", (*path_).c_str());
 
 	for (size_t i = 0; i < entities->size(); i++) {
 		if ((e = ThreadPool::entities->getItem(i).isThisEntityE(*path_)) != NULL ) 
 		{
-			index = 0;
 			break;
 		}
 	}
 
-	if (index == -1) {
-		formatted_err("SOMTHING IS NO YES");
+	if (e == NULL) 
+	{
+		formatted_err("LOST ENTITY! %s", (*path_).c_str());
+		return;
 	}
 
 	FoldingRule *foldingRule = new FoldingRule();
 
 	foldingRule->setContour(e->getContour());
-	foldingRule->setCenter(cv::Point(0,0));
+	foldingRule->setCenter(e->getPointZero());
 
 	std::vector<double> histogram = foldingRule->getHistogram(0.5, false);
 
 	// TODO: save histogram in file
 
-	formatted_log("End foldingRule");
+	// formatted_log("End foldingRule");
 
+	formatted_inf("End working for: %s", (*path_).c_str());
 	path_ = NULL;
 	delete foldingRule;
-	// delete point;
 }
 
 void ThreadPool::cartographer_worker(void *path, void *not_use) 
 {
-	// tmp
-	cv::Point p_z = cv::Point(0, 0);
+	Entity *e;
+	
+	std::string *path_ = (std::string *)path;
+	formatted_log("Start cartographer_worker() for %s", (*path_).c_str());
 
-	cv::Point *arr_contour = new cv::Point();
-	size_t size;
+	for (size_t i = 0; i < entities->size(); i++) {
+		if ((e = ThreadPool::entities->getItem(i).isThisEntityE(*path_)) != NULL ) 
+		{
+			break;
+		}
+	}
+
+	if (e == NULL) 
+	{
+		formatted_err("LOST ENTITY! %s", (*path_).c_str());
+		return;
+	}
+
+	Rectification rec = e->getRect();
+	cv::Mat image = cv::imread((*path_).c_str(), CV_LOAD_IMAGE_COLOR);
+
+	if (image.empty())
+	{
+		formatted_err("Could not open or find the image \"%s\"", (*path_).c_str());
+
+		return;
+	}
 
 	Cartographer *cartographer = new Cartographer();
-	std::string *path_ = (std::string *)path;
-
-	cv::Mat image = cv::imread((*path_).c_str(), CV_LOAD_IMAGE_COLOR);
 	cartographer->setSrcImg(image);
 	cartographer->makeBorder(false);
 
-	Entity *e = new Entity( (*path_), cartographer->getContour() );
+	std::vector<cv::Point> contour = cartographer->getContour();
 
-	ThreadPool::entities->push(*e);
-	
-	formatted_log("Add %s to foldingRule", (*path_).c_str());
+	// tmp solution
+	for (size_t i = 0; i < contour.size(); i++)
+	{
+		Point2f p = contour[i];
+		rec.straightenPoint(p);
+		contour[i] = p;
+	}
+
+	e->setContour(std::move(contour));
 
 	ThreadPool::sQueue->push( { ThreadPool::folding_rule_worker, path_, NULL } );
 
-	// formatted_log("Queue size %d", sQueue->size());
-
-	cartographer = NULL;
 	path_ = NULL;
-	arr_contour = NULL;
-	// p_z = NULL;
-	// delete cartographer;
-	// delete path_;
+	delete cartographer;
+}
+
+// TODO dodaj opis co tu się dzieje
+void ThreadPool::symmetry_worker(void *path, void *not_use)
+{
+	cv::Mat tmp;
+	std::string *path_ = (std::string *)path;
+	formatted_log("Start symmetry_worker() for %s", (*path_).c_str());
+
+	cv::Mat image = cv::imread((*path_).c_str(), CV_LOAD_IMAGE_COLOR);
+
+	if (image.empty())
+	{
+		formatted_err("Could not open or find the image \"%s\"", (*path_).c_str());
+
+		return;
+	}
+
+	float rho_divs   = hypotf( image.rows, image.cols ) + 1;
+	float theta_divs = 180.0;
+
+	SymmetryDetector detector( image.size(), Size(rho_divs, theta_divs), 1 );
+	pair<cv::Point, cv::Point> symmetry = detector.getResult(image);
+
+	straight_t sym = createStraightFrom2Point(symmetry.first, symmetry.second);
+
+	StartingPoint sp(std::move(image), sym);
+	cv::Point2f starting = sp.getStartingPoint(0.5);
+
+	Rectification rec(std::move(image), sym);
+
+	rec.straightenPoint(starting);
+	tmp = rec.straightenImg();
+
+	Entity *e = new Entity( (*path_), std::move(rec), std::move(starting) );
+
+	ThreadPool::entities->push(*e);
+	ThreadPool::sQueue->push( { ThreadPool::cartographer_worker, path_, NULL } );
 }
 
 void ThreadPool::set_starts_value() 
