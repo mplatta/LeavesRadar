@@ -4,7 +4,8 @@ void FoldingRule::scaling(double min, double max)
 {
 	formatted_log("Scaling histogram");
 
-	for (int i = 0; i < histogram.size(); ++i) {
+	for (int i = 0; i < histogram.size(); ++i) 
+	{
 		histogram[i] = ((histogram[i] - min) / (max - min));
 	}
 }
@@ -111,4 +112,19 @@ std::vector<double> FoldingRule::getHistogram(double angle, bool force)
 		this->createHistogram(angle);
 
 	return this->histogram;
+}
+
+void FoldingRule::saveHistogram(std::string path, std::string name)
+{
+	std::string full_path = path + "/" + name;
+
+	std::ofstream file;
+	file.open(full_path);
+
+	for (size_t i = 0; i < this->histogram.size(); ++i)
+	{
+		file << std::to_string(this->histogram[i]) << ";" << std::endl;
+	}
+
+	file.close();
 }

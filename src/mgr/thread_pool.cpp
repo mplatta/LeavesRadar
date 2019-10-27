@@ -92,6 +92,15 @@ void ThreadPool::folding_rule_worker(void *path, void *not_use)
 
 	// TODO: save histogram in file
 
+	std::string file_name = extract_name(*path_);
+	unsigned long long id;
+	
+	ThreadPool::sQueue->getId(&id);
+
+	// formatted_log("File name: %s ( %d )", file_name.c_str(), id);
+
+	foldingRule->saveHistogram("..", file_name + "(" + std::to_string(id) + ")");
+
 	// formatted_log("End foldingRule");
 
 	formatted_inf("End working for: %s", (*path_).c_str());
@@ -104,6 +113,7 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 	Entity *e;
 	
 	std::string *path_ = (std::string *)path;
+
 	formatted_log("Start cartographer_worker() for %s", (*path_).c_str());
 
 	for (size_t i = 0; i < entities->size(); i++) {
@@ -152,10 +162,12 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 }
 
 // TODO dodaj opis co tu się dzieje
-void ThreadPool::symmetry_worker(void *path, void *not_use)
+void ThreadPool::symmetry_worker(void *path, void *out_path)
 {
 	cv::Mat tmp;
 	std::string *path_ = (std::string *)path;
+	std::string *out_path_ = (std::string *)out_path;
+	
 	formatted_log("Start symmetry_worker() for %s", (*path_).c_str());
 
 	cv::Mat image = cv::imread((*path_).c_str(), CV_LOAD_IMAGE_COLOR);
@@ -166,6 +178,12 @@ void ThreadPool::symmetry_worker(void *path, void *not_use)
 
 		return;
 	}
+
+	// // TODO: wymyslic cos
+	// if ((*out_path_).empty()) 
+	// {
+	// 	;		
+	// }
 
 	float rho_divs   = hypotf( image.rows, image.cols ) + 1;
 	float theta_divs = 180.0;

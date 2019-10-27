@@ -1,6 +1,9 @@
 #ifndef _FOLDING_RULE_H_
 #define _FOLDING_RULE_H_
 
+#include <fstream>
+#include <iostream>
+
 #include "opencv_headers.hpp"
 #include "formatted_log.hpp"
 #include "constants.hpp"
@@ -47,6 +50,8 @@ public:
 	void setContour   ( std::vector<cv::Point> _contour ) { this->contour = _contour; };
 	void setCenter    ( cv::Point              _center  ) { this->center  = _center ; };
 
+	/* -------------------------- METHODS ------------------------ */
+	void saveHistogram(std::string path, std::string name);
 	// unnecessary
 	// inline static float distance(cv::Point a, cv::Point b) { return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2)); };
 	

@@ -1,37 +1,17 @@
 #include <iostream>
 #include <pthread.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
-#include "cartographer.hpp"
+#include "dir_functions.hpp"
 #include "formatted_log.hpp"
 #include "thread_pool.hpp"
 
 using namespace cv;
 
-static bool dirExists(const char *path)
-{
-	struct stat info;
-
-	if( stat( path, &info ) != 0 )
-    	formatted_err( "Cannot access %s", path );
-	else if( info.st_mode & S_IFDIR )
-	{
-    	formatted_log( "%s directory exists", path );
-
-    	return true;
-	}
-	else
-    	formatted_err( "%s is no directory", path );
-	
-	return false;
-}
-
-void all_image_mode(string file, ThreadPool *pool) 
+void all_image_mode(string file, ThreadPool *pool, int flag) 
 {
 	std::vector<string> image_names;
 
-	if (dirExists(file.c_str()))
+	if (dir_exists(file.c_str()))
 	{
 		glob(file + "/*.jpg", image_names);
 
@@ -50,7 +30,7 @@ void all_image_mode(string file, ThreadPool *pool)
 	}
 }
 
-void one_image_mode(string file, ThreadPool *pool) 
+void one_image_mode(string file, ThreadPool *pool, int flag) 
 {
 	formatted_inf("%s", file.c_str());
 	pool->getSQueue()->push( { NULL, &file, NULL } );
@@ -63,10 +43,10 @@ int main( int argc, char** argv )
 	ThreadPool *pool = new ThreadPool();
 
 	/*	type of start program
-		0 - run program for all img in dir
-		1 - run program for one img
+		1 - run program for all img in dir
+		2 - run program for one img
 	*/
-	int flag = -1;
+	int flag = 0;
 	string file = "";
 
 	if (argc > 1) 
@@ -74,18 +54,24 @@ int main( int argc, char** argv )
 		for (int i = 0; i < argc; ++i) 
 		{
 			if ( (strcmp(argv[i], "--path") == 0 ) &&
-				 (argc >= i) && (flag != 1) )
+				 (argc >= i) && (flag != 2) )
 			{
-				file = argv[i + 1];
-				flag = 0;
 				formatted_inf("All image mode");
+				file = argv[i + 1];
+				flag = flag | 1;
 			}
 			if ( (strcmp(argv[i], "--file") == 0 ) &&
-				 (argc >= i) && (flag != 0) )
+				 (argc >= i) && (flag != 1) )
+			{
+				formatted_inf("One image mode");
+				file = argv[i + 1];
+				flag = flag | 2;
+			}
+			if ( (strcmp(argv[i], "--out") == 0 ) &&
+				 (argc >= i) )
 			{
 				file = argv[i + 1];
-				flag = 1;
-				formatted_inf("One image mode");
+				flag = flag | 4;
 			}
 
 			if ( strcmp(argv[i], "-g") ) {
@@ -95,7 +81,6 @@ int main( int argc, char** argv )
 		}
 	}
 
-	// tmp
 	if (flag == -1)
 	{
 		formatted_inf("RUN PROGRAM COMMAND:\nRun all image mode: ./mgr --path ../dir/\nRun one image mode: ./mgr --file ../dir/image.jpg");
@@ -103,11 +88,11 @@ int main( int argc, char** argv )
 	else 
 	{
 		switch(flag) {
-			case 0 :
-				all_image_mode(file, pool);
-				break;
 			case 1 :
-				one_image_mode(file, pool);
+				all_image_mode(file, pool, flag);
+				break;
+			case 2 :
+				one_image_mode(file, pool, flag);
 				break;
 			default :
 				formatted_err("SOMTHING IS NO YES");

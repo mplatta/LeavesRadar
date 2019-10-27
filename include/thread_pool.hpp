@@ -14,6 +14,7 @@
 #include "symmetry_detector.hpp"
 #include "straight.hpp"
 #include "starting_point.hpp"
+#include "dir_functions.hpp"
 
 #define NUM_THREADS std::thread::hardware_concurrency()
 

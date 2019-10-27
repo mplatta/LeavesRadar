@@ -13,6 +13,7 @@
 class Entity
 {
 private:
+	int                    _id       ;
 	std::string            _name     ;
 	std::vector<cv::Point> _contour  ;
 	std::vector<cv::Vec4i> _hierarchy;
@@ -22,6 +23,7 @@ private:
 
 public:
 	// getters
+	int                    getId        () { return this->_id       ; };
 	std::string            getName      () { return this->_name     ; };
 	std::vector<cv::Point> getContour   () { return this->_contour  ; };
 	std::vector<cv::Vec4i> getHierarchy () { return this->_hierarchy; };
@@ -30,6 +32,7 @@ public:
 	Rectification          getRect      () { return this->_rec      ; };
 
 	// setters
+	void setId        ( int                    id        ) { this->_id        = id       ; };
 	void setName      ( std::string            name      ) { this->_name      = name     ; };
 	void setContour   ( std::vector<cv::Point> contour   ) { this->_contour   = contour  ; };
 	void setHierarchy ( std::vector<cv::Vec4i> hierarchy ) { this->_hierarchy = hierarchy; };
