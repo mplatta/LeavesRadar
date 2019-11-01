@@ -159,7 +159,28 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 		contour[i] = p;
 	}
 
-	e->setContour(std::move(contour));
+	e->setContour(contour);
+
+	// TODO poprawic kiedys
+	Entity *e2 = new Entity();
+
+	e2->setId(e->getId());
+	e2->setName(e->getName());
+	e2->setContour(e->getContour());
+	e2->setHierarchy(e->getHierarchy());
+	e2->setPointZero(e->getPointZero());
+	e2->setRec(e->getRect());
+
+	for (size_t i = 0; i < entities->size(); i++) {
+		if ((ThreadPool::entities->getItem(i).isThisEntity(*path_))) 
+		{
+			entities->update(i, *e2);
+			break;
+		}
+	}
+
+
+	// formatted_err("EEEEEEEEEEEEEEEEEEEE: %d", e->getContour().size());
 
 	ThreadPool::sQueue->push( { ThreadPool::folding_rule_worker, path_, NULL } );
 

@@ -121,9 +121,15 @@ public:
 		id_ = 0;
 	}
 
-	// void update(int item)
-	// {
-	// 	std::unique_lock<std::mutex> mlock(mutex_);
+	void update(int index, T& item)
+	{
+		std::unique_lock<std::mutex> mlock(mutex_);
+
+		queue_[index] = std::move(item);
+
+		mlock.unlock();
+		cond_.notify_one();
+	}
 
 
 

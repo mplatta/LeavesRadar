@@ -37,8 +37,13 @@ void FoldingRule::createHistogram(double angle)
 		w = this->rotatePoint(w, this->center, rad);
 		p = this->findIntersect(this->center, w);
 
+		if (p == NULL) formatted_err("DUPA");
+
+		// formatted_log("x: %d, y:%d", p->x, p->y);
+
 		if (p) 
 		{
+			this->points.push_back(*p);
 			double tmp = cv::norm(*p - this->center);
 			
 			if (tmp > max) max = tmp;
@@ -51,25 +56,39 @@ void FoldingRule::createHistogram(double angle)
 	this->scaling(0.0, max);
 }
 
-cv::Point *FoldingRule::isIntersect(cv::Point A, cv::Point B, cv::Point C, cv::Point D) 
+bool FoldingRule::isIntersect(cv::Point A, cv::Point B, cv::Point C, cv::Point D)
 {
+	float x1 = C.x;
+	float y1 = C.y;
+	float x2 = D.y;
+	float y2 = D.y;
+
+	float x3 = A.x;
+	float y3 = A.y;
+	float x4 = B.y;
+	float y4 = B.y;
+
+	float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+	if (den == 0) return false;
+
+	float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den; 
+	float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
+
+	return (t > 0 && t < 1 && u > 0);
+}
+
+cv::Point *FoldingRule::getIntersect(cv::Point A, cv::Point B, cv::Point C, cv::Point D) 
+{
+	if (!isIntersect(A, B, C, D)) return NULL;
+
 	cv::Point *p = new cv::Point();
 	straight_t a = createStraightFrom2Point(A, B);
 	straight_t b = createStraightFrom2Point(C, D);
 
-	// formatted_log("Check intersecting");
-
 	p = isIntersectStright_t(a, b);
 
-	if (!p) return NULL;
-
-	if ( std::min(C.x, D.x) <= p->x && p->x <= std::max(C.x, D.x) && 
-		 std::min(C.y, D.y) <= p->y && p->y <= std::max(C.y, D.y) )
-		return p;
-
-	// formatted_log("Point is not in line segment!");
-
-	return NULL; 
+	return p;
 }
 
 cv::Point *FoldingRule::findIntersect(cv::Point A, cv::Point B) 
@@ -77,17 +96,16 @@ cv::Point *FoldingRule::findIntersect(cv::Point A, cv::Point B)
 	// brute force temporarily
 	cv::Point *p = new cv::Point();
 
-	for (int c = 0; c < this->contour.size(); ++c)
+	for (size_t c = 0; c < this->contour.size(); ++c)
 	{
 
 		int d = (c + 1) % this->contour.size();
-
-		p = this->isIntersect(A, B, this->contour[c], this->contour[d]);
+		p = this->getIntersect(A, B, this->contour[c], this->contour[d]);
 
 		if (p) return p;
 	}
 
-	delete p;
+	// delete p;
 
 	return NULL;
 }
