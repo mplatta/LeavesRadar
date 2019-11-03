@@ -12,7 +12,7 @@ void FoldingRule::scaling(double min, double max)
 				this->histogram[i] = this->histogram[this->histogram.size() - 1 - i];
 			else if (this->histogram[(i + 1) % this->histogram.size()] > 0.)
 				this->histogram[i] = this->histogram[i + 1];
-			else if (this->histogram[abs(i - 1) % this->histogram.size()] > 0.)
+			else if (this->histogram[(i - 1 + this->histogram.size()) % this->histogram.size()] > 0.)
 				this->histogram[i] = this->histogram[i - 1];
 			else histogram[i] = 0.;
 		}
@@ -54,7 +54,7 @@ void FoldingRule::createHistogram(double angle)
 		else 
 		{
 			histogram.push_back(-1.0);
-			// formatted_war("Not found intersecting point for angle: %f\nDirection point (%d:%d)", i, w.x - this->center.x, w.y - this->center.y);
+			formatted_war("Not found intersecting point for angle: %f\nDirection point (%d:%d)", i, w.x - this->center.x, w.y - this->center.y);
 		}
 	}
 

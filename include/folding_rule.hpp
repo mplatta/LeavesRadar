@@ -35,21 +35,18 @@ private:
 		Line-Line intersection
 		https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
 	*/
-	public: bool      isIntersect     ( cv::Point A, cv::Point B, cv::Point C, cv::Point D );
+	bool      isIntersect     ( cv::Point A, cv::Point B, cv::Point C, cv::Point D );
 	/**
 		getIntersect return pointer cv::Point if two lines intersect, 
 		if not, return NULL pointer
 		A and B - points for "zero" to end pointer
 		C and D - points for line segment in contour
 	*/
-	private: cv::Point *getIntersect   ( cv::Point A, cv::Point B, cv::Point C, cv::Point D );
+	cv::Point *getIntersect   ( cv::Point A, cv::Point B, cv::Point C, cv::Point D );
 	/**
 		return new point from rotated point "rotated" around "center" by angle 
 	*/
-	public:
 	cv::Point  rotatePoint   ( cv::Point rotated, cv::Point center, double angle  );
-	
-	private:
 	cv::Point  *findIntersect( cv::Point A, cv::Point B );
 	/**
 		same like above but added animation for debugging

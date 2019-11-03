@@ -13,7 +13,7 @@ void all_image_mode(std::string file, ThreadPool *pool)
 
 	if (dir_exists(file.c_str()))
 	{
-		glob(file + "/*.jpg", image_names);
+		glob(delete_last_slash(file) + "/*.jpg", image_names);
 
 		for (size_t i = 0; i < image_names.size(); ++i)
 		{

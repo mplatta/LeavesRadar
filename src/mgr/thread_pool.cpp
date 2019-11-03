@@ -27,7 +27,8 @@ void ThreadPool::worker(int id)
 			else if (st.func == NULL && st.fir_data != NULL)
 			{
 				// if first data is empty, start first worker func
-				ThreadPool::symmetry_worker(st.fir_data, st.sec_data);	
+				// ThreadPool::symmetry_worker(st.fir_data, st.sec_data);	
+				ThreadPool::all_in_one(st.fir_data, st.sec_data);	
 			}
 		}
 		else 
@@ -64,13 +65,89 @@ void ThreadPool::worker(int id)
 	} while (!ThreadPool::stop_flag);
 }
 
+void ThreadPool::all_in_one(void *path, void *not_use)
+{	
+	cv::Mat tmp;
+	std::string *path_ = (std::string *)path;
+	
+	formatted_log("Start symmetry_worker() for %s", (*path_).c_str());
+
+	cv::Mat image = cv::imread((*path_).c_str(), CV_LOAD_IMAGE_COLOR);
+
+	if (image.empty())
+	{
+		formatted_err("Could not open or find the image \"%s\"", (*path_).c_str());
+
+		return;
+	}
+
+	float rho_divs   = hypotf( image.rows, image.cols ) + 1;
+	float theta_divs = 180.0;
+
+	SymmetryDetector detector( image.size(), Size(rho_divs, theta_divs), 1 );
+	pair<cv::Point, cv::Point> symmetry = detector.getResult(image);
+
+	straight_t sym = createStraightFrom2Point(symmetry.first, symmetry.second);
+
+	StartingPoint sp(std::move(image), sym);
+	cv::Point2f starting = sp.getStartingPoint(0.5);
+
+	Rectification rec(std::move(image), sym);
+
+	rec.straightenPoint(starting);
+	tmp = rec.straightenImg();
+
+//////////////////////////////////////////////////////////////////
+
+	Cartographer *cartographer = new Cartographer();
+	cartographer->setSrcImg(rec.getImg());
+	cartographer->makeBorder(true);
+
+	std::vector<cv::Point> contour = cartographer->getContour();
+
+	// tmp solution
+	for (size_t i = 0; i < contour.size(); i++)
+	{
+		Point2f p = contour[i];
+		rec.straightenPoint(p);
+		contour[i] = p;
+	}
+
+///////////////////////////////////////////////////////////////////
+	const double angle = 0.5;
+	unsigned long long id;
+
+	formatted_log("Start folding_rule_worker() for %s", (*path_).c_str());
+
+	FoldingRule *foldingRule = new FoldingRule();
+
+	foldingRule->setContour(contour);
+	foldingRule->setCenter(starting);
+
+	std::vector<double> histogram = foldingRule->getHistogram(angle, false);
+	std::string file_name = extract_name(*path_);
+	
+	ThreadPool::sQueue->getId(&id);
+
+	std::string tmp_name = delete_last_slash(ThreadPool::_out_path);
+
+	foldingRule->saveHistogram( tmp_name, 
+		file_name + "(" + std::to_string(id) + ")", angle );
+
+	formatted_inf("End working for: %s", (*path_).c_str());
+
+	path_ = NULL;
+	delete foldingRule;
+	delete cartographer;
+}
+
 void ThreadPool::folding_rule_worker(void *path, void *not_use)
 {
 	const double angle = 0.5;
 	Entity *e;
 	
 	std::string *path_ = (std::string *)path;
-	formatted_log("Start folding_rule_workerl() for %s", (*path_).c_str());
+	formatted_log("Start folding_rule_worker() for %s", (*path_).c_str());
 
 	for (size_t i = 0; i < entities->size(); i++) {
 		if ((e = ThreadPool::entities->getItem(i).isThisEntityE(*path_)) != NULL ) 
@@ -154,8 +231,6 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 
 	formatted_log("CONTURY: %d, first: %d:%d", contour.size(), contour[0].x, contour[0].y);
 
-	// e->setContour(contour);
-
 	// TODO poprawic kiedys
 	Entity *e2 = new Entity();
 
@@ -214,8 +289,6 @@ void ThreadPool::symmetry_worker(void *path, void *not_use)
 	tmp = rec.straightenImg();
 
 	Entity *e = new Entity( (*path_), std::move(rec), std::move(starting) );
-
-	formatted_log("WWWWWWWWWWWww: %s", (*path_).c_str());
 
 	ThreadPool::entities->push(*e);
 	ThreadPool::sQueue->push( { ThreadPool::cartographer_worker, path_, NULL } );

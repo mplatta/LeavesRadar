@@ -45,13 +45,21 @@ static std::string extract_name(std::string path)
 {
 	std::string result;
 	int l = 0;
-	// formatted_log("%s", path.c_str());
+
 	for (int i = path.length() - 1; i >= 0; --i, ++l)
 	{	
-		// formatted_log("%c", path[i]);
 		if (path[i] == '/') 
 		{
 			result = path.substr(i + 1, l);
+			break;
+		}
+	}
+
+	for (int i = result.length() - 1; i >= 0; i--)
+	{	
+		if (result[i] == '.') 
+		{
+			result = result.substr(0, i);
 			break;
 		}
 	}
