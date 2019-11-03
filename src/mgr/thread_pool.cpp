@@ -94,8 +94,8 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 
 	Rectification rec(std::move(image), sym);
 
-	rec.straightenPoint(starting);
 	tmp = rec.straightenImg();
+	rec.straightenPoint(starting);
 
 //////////////////////////////////////////////////////////////////
 
