@@ -19,6 +19,10 @@ private:
 		in 0-1 interval 	
 	*/
 	std::vector<double>    histogram;
+
+	/**
+		only for debug
+	*/
 	std::vector<cv::Point> points;
 
 	//scaling distance to 0-1 interval and save to histogram
@@ -57,7 +61,10 @@ public:
 	/* -------------------------- GETTERS ------------------------ */
 	std::vector<cv::Point> getContour  () { return this->contour; };
 	cv::Point              getCenter   () { return this->center ; };
+	
+	#ifdef DEBUG
 	std::vector<cv::Point> getPoints   () { return this->points ; };
+	#endif
 	/** if force is true, histogram always will be calculate from zero;
 		if false, function return histogram without calculation (if was calculate before)
 	*/
