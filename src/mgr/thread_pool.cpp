@@ -66,6 +66,7 @@ void ThreadPool::worker(int id)
 
 void ThreadPool::folding_rule_worker(void *path, void *not_use)
 {
+	const double angle = 0.5;
 	Entity *e;
 	
 	std::string *path_ = (std::string *)path;
@@ -89,27 +90,19 @@ void ThreadPool::folding_rule_worker(void *path, void *not_use)
 	foldingRule->setContour(e->getContour());
 	foldingRule->setCenter(e->getPointZero());
 
-	std::vector<double> histogram = foldingRule->getHistogram(0.5, false);
-
-	// TODO: save histogram in file
-
+	std::vector<double> histogram = foldingRule->getHistogram(angle, false);
 	std::string file_name = extract_name(*path_);
 	unsigned long long id;
 	
 	ThreadPool::sQueue->getId(&id);
 
-	// formatted_log("File name: %s ( %d )", file_name.c_str(), id);
-
-	// formatted_err("%s", ThreadPool::_out_path);
-
 	std::string tmp = delete_last_slash(ThreadPool::_out_path);
 
 	foldingRule->saveHistogram( tmp, 
-		file_name + "(" + std::to_string(id) + ")" );
-
-	// formatted_log("End foldingRule");
+		file_name + "(" + std::to_string(id) + ")", angle );
 
 	formatted_inf("End working for: %s", (*path_).c_str());
+
 	path_ = NULL;
 	delete foldingRule;
 }
@@ -121,6 +114,10 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 	std::string *path_ = (std::string *)path;
 
 	formatted_log("Start cartographer_worker() for %s", (*path_).c_str());
+
+	for (size_t i = 0; i < entities->size(); i++) {
+		formatted_log("ILLLLLLE %s", ThreadPool::entities->getItem(i).getName().c_str()); 
+	}
 
 	for (size_t i = 0; i < entities->size(); i++) {
 		if ((e = ThreadPool::entities->getItem(i).isThisEntityE(*path_)) != NULL ) 
@@ -159,28 +156,39 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 		contour[i] = p;
 	}
 
-	e->setContour(contour);
+	formatted_log("CONTURY: %d, first: %d:%d", contour.size(), contour[0].x, contour[0].y);
+
+	// e->setContour(contour);
 
 	// TODO poprawic kiedys
 	Entity *e2 = new Entity();
 
-	e2->setId(e->getId());
-	e2->setName(e->getName());
-	e2->setContour(e->getContour());
-	e2->setHierarchy(e->getHierarchy());
-	e2->setPointZero(e->getPointZero());
-	e2->setRec(e->getRect());
+	e2->setId(std::move(e->getId()));
+	e2->setName(std::move(e->getName()));
+	e2->setContour(std::move(contour));
+	e2->setHierarchy(std::move(e->getHierarchy()));
+	e2->setPointZero(std::move(e->getPointZero()));
+	e2->setRec(std::move(e->getRect()));
 
-	for (size_t i = 0; i < entities->size(); i++) {
+	for (size_t i = 0; i < ThreadPool::entities->size(); i++) {
 		if ((ThreadPool::entities->getItem(i).isThisEntity(*path_))) 
 		{
-			entities->update(i, *e2);
+			ThreadPool::entities->update(i, *e2);
+			break;
+		}
+	}
+	
+	Entity *e3;
+
+	for (size_t i = 0; i < ThreadPool::entities->size(); i++) {
+		if ((e3 = ThreadPool::entities->getItem(i).isThisEntityE(*path_)) != NULL ) 
+		{
+			formatted_err("RTTTATATATTAATTA: %d   --   %d:%d", e3->getContour().size(), e3->getContour()[0].x, e3->getContour()[0].y);
 			break;
 		}
 	}
 
 
-	// formatted_err("EEEEEEEEEEEEEEEEEEEE: %d", e->getContour().size());
 
 	ThreadPool::sQueue->push( { ThreadPool::folding_rule_worker, path_, NULL } );
 
@@ -222,6 +230,8 @@ void ThreadPool::symmetry_worker(void *path, void *not_use)
 	tmp = rec.straightenImg();
 
 	Entity *e = new Entity( (*path_), std::move(rec), std::move(starting) );
+
+	formatted_log("WWWWWWWWWWWww: %s", (*path_).c_str());
 
 	ThreadPool::entities->push(*e);
 	ThreadPool::sQueue->push( { ThreadPool::cartographer_worker, path_, NULL } );

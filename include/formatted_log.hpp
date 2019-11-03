@@ -14,8 +14,6 @@
 // TODO: make more generic
 inline char* cutFileName(char *txt) 
 {
-	// char *file_name = "src/";
-	// return txt + 4;
 	return strrchr(txt, '/');
 }
 #define formatted_log(msg, ...) \
@@ -30,6 +28,10 @@ inline char* cutFileName(char *txt)
 
 #define formatted_inf(msg, ...) \
 	do {fprintf(stderr, "\x1B[34mINF: \033[0m" msg "\n", ##__VA_ARGS__); } \
+	while(0)
+
+#define formatted_war(msg, ...) \
+	do {if (!DNDEBUG) fprintf(stderr, "\x1B[93mWARNING: \033[0m" msg "\n", ##__VA_ARGS__); } \
 	while(0)
 
 #endif

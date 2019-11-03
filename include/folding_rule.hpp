@@ -24,6 +24,10 @@ private:
 	//scaling distance to 0-1 interval and save to histogram
 	void scaling             ( double min, double max ) ;
 	void createHistogram     ( double angle )           ;
+	/**
+		same like above but added animation for debugging
+	*/
+	// void createHistogram2(double angle, cv::Mat img, std::string name);
 
 	/**
 		isIntersect Checks if the ray starting at point A passing 
@@ -31,19 +35,26 @@ private:
 		Line-Line intersection
 		https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
 	*/
-	bool      isIntersect     ( cv::Point A, cv::Point B, cv::Point C, cv::Point D );
+	public: bool      isIntersect     ( cv::Point A, cv::Point B, cv::Point C, cv::Point D );
 	/**
 		getIntersect return pointer cv::Point if two lines intersect, 
 		if not, return NULL pointer
 		A and B - points for "zero" to end pointer
 		C and D - points for line segment in contour
 	*/
-	cv::Point *getIntersect   ( cv::Point A, cv::Point B, cv::Point C, cv::Point D );
+	private: cv::Point *getIntersect   ( cv::Point A, cv::Point B, cv::Point C, cv::Point D );
 	/**
 		return new point from rotated point "rotated" around "center" by angle 
 	*/
+	public:
 	cv::Point  rotatePoint   ( cv::Point rotated, cv::Point center, double angle  );
+	
+	private:
 	cv::Point  *findIntersect( cv::Point A, cv::Point B );
+	/**
+		same like above but added animation for debugging
+	*/
+	// cv::Point *findIntersectA(cv::Point A, cv::Point B, cv::Mat img, std::string name );
 
 public:
 	/* -------------------------- GETTERS ------------------------ */
@@ -54,6 +65,10 @@ public:
 		if false, function return histogram without calculation (if was calculate before)
 	*/
 	std::vector<double>    getHistogram(double angle, bool force);
+	/**
+		same like above but added animation for debugging
+	*/
+	// std::vector<double>    getHistogramAnim(double angle, bool force, cv::Mat img, std::string name);
 	// std::vector<double>    getHistogram()           { return this->histogram; };
 
 	/* -------------------------- SETTERS ------------------------ */
@@ -61,7 +76,7 @@ public:
 	void setCenter    ( cv::Point              _center  ) { this->center  = _center ; };
 
 	/* -------------------------- METHODS ------------------------ */
-	void saveHistogram(std::string path, std::string name);
+	void saveHistogram( std::string path, std::string name, const double angle );
 	// unnecessary
 	// inline static float distance(cv::Point a, cv::Point b) { return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2)); };
 	

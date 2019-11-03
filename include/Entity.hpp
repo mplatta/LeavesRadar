@@ -39,8 +39,9 @@ public:
 	void setRec       ( Rectification          rec       ) { this->_rec       = rec      ; };
 
 	// func
-	bool isThisEntity     ( std::string name ); 
-	Entity *isThisEntityE ( std::string name ); 
+	bool   isThisEntity   ( std::string name ); 
+	Entity *isThisEntityE ( std::string name );
+	Entity clone          ( );
 
 	// constructors/destructors
 	Entity()  {};

@@ -122,7 +122,7 @@ public:
 	}
 
 	void update(int index, T& item)
-	{
+	{	
 		std::unique_lock<std::mutex> mlock(mutex_);
 
 		queue_[index] = std::move(item);
