@@ -23,6 +23,7 @@ OPENCV	= `pkg-config opencv --cflags --libs`
 LIBS	= -lpthread $(OPENCV)
 
 OUT_DIR = bin/
+RESULT_DRI = out/
 MKDIR_P	= mkdir -p
 
 DEBUG	?= 0;
@@ -32,10 +33,12 @@ endif
 
 $(PROG):$(SRCS)
 	${MKDIR_P} ${OUT_DIR}
+	${MKDIR_P} ${RESULT_DRI}
 	$(CXX) $(CFLAGS) -o $(PROG) $(SOURCES) $(LIBS)
 
 scratchpad:
 	${MKDIR_P} ${OUT_DIR}
+	${MKDIR_P} ${RESULT_DRI}
 	$(CXX) $(CFLAGS) -o $(SCRATCH) $(SRC_SCR) $(LIBS)
 
 clean:

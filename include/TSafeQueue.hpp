@@ -15,6 +15,7 @@ private:
 	std::deque<T> queue_;
 	std::mutex mutex_;
 	std::condition_variable cond_;
+	unsigned long long id_;
 
 public:
 	// not safe
@@ -23,6 +24,7 @@ public:
 		return queue_;
 	}
 	// --------
+
 
 	T getItem(int i) 
 	{
@@ -105,9 +107,29 @@ public:
 		return queue_.size();
 	}
 
-	// void update(int item)
-	// {
-	// 	std::unique_lock<std::mutex> mlock(mutex_);
+	void getId(unsigned long long *id_to_save) {
+		std::unique_lock<std::mutex> mlock(mutex_);
+		
+		id_++;
+		*id_to_save = id_;
+		
+		mlock.unlock();
+		cond_.notify_one();
+	}
+
+	TSafeQueue() {
+		id_ = 0;
+	}
+
+	void update(int index, T& item)
+	{	
+		std::unique_lock<std::mutex> mlock(mutex_);
+
+		queue_[index] = std::move(item);
+
+		mlock.unlock();
+		cond_.notify_one();
+	}
 
 
 
