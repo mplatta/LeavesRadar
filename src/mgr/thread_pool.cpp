@@ -116,10 +116,6 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 	formatted_log("Start cartographer_worker() for %s", (*path_).c_str());
 
 	for (size_t i = 0; i < entities->size(); i++) {
-		formatted_log("ILLLLLLE %s", ThreadPool::entities->getItem(i).getName().c_str()); 
-	}
-
-	for (size_t i = 0; i < entities->size(); i++) {
 		if ((e = ThreadPool::entities->getItem(i).isThisEntityE(*path_)) != NULL ) 
 		{
 			break;
@@ -177,18 +173,6 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 			break;
 		}
 	}
-	
-	Entity *e3;
-
-	for (size_t i = 0; i < ThreadPool::entities->size(); i++) {
-		if ((e3 = ThreadPool::entities->getItem(i).isThisEntityE(*path_)) != NULL ) 
-		{
-			formatted_err("RTTTATATATTAATTA: %d   --   %d:%d", e3->getContour().size(), e3->getContour()[0].x, e3->getContour()[0].y);
-			break;
-		}
-	}
-
-
 
 	ThreadPool::sQueue->push( { ThreadPool::folding_rule_worker, path_, NULL } );
 
