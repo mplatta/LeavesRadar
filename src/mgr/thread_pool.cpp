@@ -27,7 +27,8 @@ void ThreadPool::worker(int id)
 			else if (st.func == NULL && st.fir_data != NULL)
 			{
 				// if first data is empty, start first worker func
-				ThreadPool::symmetry_worker(st.fir_data, st.sec_data);	
+				// ThreadPool::symmetry_worker(st.fir_data, st.sec_data);	
+				ThreadPool::all_in_one(st.fir_data, st.sec_data);	
 			}
 		}
 		else 
@@ -64,12 +65,89 @@ void ThreadPool::worker(int id)
 	} while (!ThreadPool::stop_flag);
 }
 
+void ThreadPool::all_in_one(void *path, void *not_use)
+{	
+	cv::Mat tmp;
+	std::string *path_ = (std::string *)path;
+	
+	formatted_log("Start symmetry_worker() for %s", (*path_).c_str());
+
+	cv::Mat image = cv::imread((*path_).c_str(), CV_LOAD_IMAGE_COLOR);
+
+	if (image.empty())
+	{
+		formatted_err("Could not open or find the image \"%s\"", (*path_).c_str());
+
+		return;
+	}
+
+	float rho_divs   = hypotf( image.rows, image.cols ) + 1;
+	float theta_divs = 180.0;
+
+	SymmetryDetector detector( image.size(), Size(rho_divs, theta_divs), 1 );
+	pair<cv::Point, cv::Point> symmetry = detector.getResult(image);
+
+	straight_t sym = createStraightFrom2Point(symmetry.first, symmetry.second);
+
+	StartingPoint sp(std::move(image), sym);
+	cv::Point2f starting = sp.getStartingPoint(0.5);
+
+	Rectification rec(std::move(image), sym);
+
+	rec.straightenPoint(starting);
+	tmp = rec.straightenImg();
+
+//////////////////////////////////////////////////////////////////
+
+	Cartographer *cartographer = new Cartographer();
+	cartographer->setSrcImg(rec.getImg());
+	cartographer->makeBorder(true);
+
+	std::vector<cv::Point> contour = cartographer->getContour();
+
+	// tmp solution
+	for (size_t i = 0; i < contour.size(); i++)
+	{
+		Point2f p = contour[i];
+		rec.straightenPoint(p);
+		contour[i] = p;
+	}
+
+///////////////////////////////////////////////////////////////////
+	const double angle = 0.5;
+	unsigned long long id;
+
+	formatted_log("Start folding_rule_worker() for %s", (*path_).c_str());
+
+	FoldingRule *foldingRule = new FoldingRule();
+
+	foldingRule->setContour(contour);
+	foldingRule->setCenter(starting);
+
+	std::vector<double> histogram = foldingRule->getHistogram(angle, false);
+	std::string file_name = extract_name(*path_);
+	
+	ThreadPool::sQueue->getId(&id);
+
+	std::string tmp_name = delete_last_slash(ThreadPool::_out_path);
+
+	foldingRule->saveHistogram( tmp_name, 
+		file_name + "(" + std::to_string(id) + ")", angle );
+
+	formatted_inf("End working for: %s", (*path_).c_str());
+
+	path_ = NULL;
+	delete foldingRule;
+	delete cartographer;
+}
+
 void ThreadPool::folding_rule_worker(void *path, void *not_use)
 {
+	const double angle = 0.5;
 	Entity *e;
 	
 	std::string *path_ = (std::string *)path;
-	formatted_log("Start folding_rule_workerl() for %s", (*path_).c_str());
+	formatted_log("Start folding_rule_worker() for %s", (*path_).c_str());
 
 	for (size_t i = 0; i < entities->size(); i++) {
 		if ((e = ThreadPool::entities->getItem(i).isThisEntityE(*path_)) != NULL ) 
@@ -89,27 +167,19 @@ void ThreadPool::folding_rule_worker(void *path, void *not_use)
 	foldingRule->setContour(e->getContour());
 	foldingRule->setCenter(e->getPointZero());
 
-	std::vector<double> histogram = foldingRule->getHistogram(0.5, false);
-
-	// TODO: save histogram in file
-
+	std::vector<double> histogram = foldingRule->getHistogram(angle, false);
 	std::string file_name = extract_name(*path_);
 	unsigned long long id;
 	
 	ThreadPool::sQueue->getId(&id);
 
-	// formatted_log("File name: %s ( %d )", file_name.c_str(), id);
-
-	// formatted_err("%s", ThreadPool::_out_path);
-
 	std::string tmp = delete_last_slash(ThreadPool::_out_path);
 
 	foldingRule->saveHistogram( tmp, 
-		file_name + "(" + std::to_string(id) + ")" );
-
-	// formatted_log("End foldingRule");
+		file_name + "(" + std::to_string(id) + ")", angle );
 
 	formatted_inf("End working for: %s", (*path_).c_str());
+
 	path_ = NULL;
 	delete foldingRule;
 }
@@ -159,7 +229,25 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 		contour[i] = p;
 	}
 
-	e->setContour(std::move(contour));
+	formatted_log("CONTURY: %d, first: %d:%d", contour.size(), contour[0].x, contour[0].y);
+
+	// TODO poprawic kiedys
+	Entity *e2 = new Entity();
+
+	e2->setId(std::move(e->getId()));
+	e2->setName(std::move(e->getName()));
+	e2->setContour(std::move(contour));
+	e2->setHierarchy(std::move(e->getHierarchy()));
+	e2->setPointZero(std::move(e->getPointZero()));
+	e2->setRec(std::move(e->getRect()));
+
+	for (size_t i = 0; i < ThreadPool::entities->size(); i++) {
+		if ((ThreadPool::entities->getItem(i).isThisEntity(*path_))) 
+		{
+			ThreadPool::entities->update(i, *e2);
+			break;
+		}
+	}
 
 	ThreadPool::sQueue->push( { ThreadPool::folding_rule_worker, path_, NULL } );
 

@@ -89,14 +89,14 @@ void Cartographer::getBorder()
 	// TODO: change to one contour and delete drawing
 	// draw contours to source img
 
-	for(int i = 0; i < this->contours.size(); ++i)
-	{
-		if (cv::contourArea(contours[i]) < 400) continue;	// ignore area smaller than 400
-		if (hierarchy[i][3] < 0) continue; 					// ignore inside contours
+	// for(int i = 0; i < this->contours.size(); ++i)
+	// {
+		// if (cv::contourArea(contours[i]) < 400) continue;	// ignore area smaller than 400
+		// if (hierarchy[i][3] < 0) continue; 					// ignore inside contours
 
-		cv::drawContours(output, this->contours, i,
+		cv::drawContours(output, this->contours, index,
 						 cv::Scalar(0, 0, 255), 2, 8, this->hierarchy, 0);
-	}
+	// }
 
 	this->bordered = output;
 }

@@ -33,6 +33,7 @@ private:
 	static void folding_rule_worker ( void *contour, void *size    ) ;
 	static void cartographer_worker ( void *path   , void *not_use ) ;
 	static void symmetry_worker     ( void *path   , void *not_use ) ;
+	static void all_in_one          ( void *path   , void *not_use ) ;
 
 	static void	set_starts_value	();
 
