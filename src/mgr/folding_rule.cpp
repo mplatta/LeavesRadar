@@ -1,22 +1,42 @@
 #include "folding_rule.hpp"
 
+void FoldingRule::blure()
+{
+	for (size_t i = 0; i < this->histogram.size(); ++i) 
+	{
+		size_t b = (i + this->histogram.size() - 1) % this->histogram.size();
+		size_t n = (i + 1) % this->histogram.size();
+
+		float av = ((this->histogram[b] + this->histogram[n]) / 2);
+
+		if ((this->histogram[i] / av - 1.) < 0.15) 
+		{
+			this->histogram[i] = av;
+			continue;
+		}
+
+		if (this->histogram[i] <= 0.)
+		{
+			if ( (this->histogram[b] > 0.) && (this->histogram[n] > 0.) )
+			{
+				this->histogram[i] = av;
+			}
+			else if (this->histogram[b] > 0.) 
+			{
+				this->histogram[i] = this->histogram[b];
+			}
+			else if (this->histogram[n] > 0.) 
+			{
+				this->histogram[i] = this->histogram[n];
+			}
+			else this->histogram[i] = 0.;
+		}
+	}
+}
+
 void FoldingRule::scaling(double min, double max)
 {
 	formatted_log("Scaling histogram");
-
-	for (size_t i = 0; i < this->histogram.size(); ++i) 
-	{
-		if (this->histogram[i] < 0.)
-		{
-			if (this->histogram[this->histogram.size() - 1 - i] > 0.)
-				this->histogram[i] = this->histogram[this->histogram.size() - 1 - i];
-			else if (this->histogram[(i + 1) % this->histogram.size()] > 0.)
-				this->histogram[i] = this->histogram[i + 1];
-			else if (this->histogram[(i - 1 + this->histogram.size()) % this->histogram.size()] > 0.)
-				this->histogram[i] = this->histogram[i - 1];
-			else histogram[i] = 0.;
-		}
-	}
 
 	for (size_t i = 0; i < this->histogram.size(); ++i) 
 	{
@@ -60,6 +80,7 @@ void FoldingRule::createHistogram(double angle)
 
 	formatted_log("histogram size: %d", this->histogram.size());
 
+	this->blure();
 	this->scaling(0.0, max);
 }
 

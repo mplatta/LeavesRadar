@@ -19,6 +19,57 @@ void Cartographer::shiftHueSpace(cv::Mat *h, int const shift)
 	*h = h_tmp;
 }
 
+void Cartographer::cutImage()
+{
+	const int frame = 0;
+
+	int min_x = this->src.size().width;
+	int min_y = this->src.size().height;
+	int max_x = 0;
+	int max_y = 0;
+
+	std::vector<cv::Point> contour_;
+
+	for (size_t i = 0; i < this->contour.size(); i++)
+	{
+		int b = (i + this->contour.size() - 1) % this->contour.size();
+		int n = (i + 1) % this->contour.size();
+		float avX = ((this->contour[b].x + this->contour[n].x) / 2);
+		float avY = ((this->contour[n].y + this->contour[n].y) / 2);
+
+		if ( ((this->contour[i].x / avX) - 1 > 0.15) || 
+			 ((this->contour[i].y / avY) - 1 > 0.15) )
+		{
+			formatted_war("Some contour point is different from its neighbors by more than 15%");
+			continue;
+		}
+
+		contour_.push_back(this->contour[i]);
+
+		if (this->contour[i].x < min_x) min_x = this->contour[i].x;
+		if (this->contour[i].y < min_y) min_y = this->contour[i].y;
+
+		if (this->contour[i].x > max_x) max_x = this->contour[i].x;
+		if (this->contour[i].y > max_y) max_y = this->contour[i].y;
+	}
+
+	int max_frame_x = (max_x + frame < this->src.size().width) ? frame : this->src.size().width;
+	int max_frame_y = (max_y + frame < this->src.size().height) ? frame : this->src.size().height;
+	int min_frame_x = (frame < min_x) ? frame : 0;
+	int min_frame_y = (frame < min_y) ? frame : 0;
+
+	this->cuted = cv::Mat(this->src, cv::Rect(min_x - frame, min_y - frame, max_x - min_x + frame, max_y - min_y + frame));
+
+	for (size_t i = 0; i < contour_.size(); i++)
+	{
+		contour_[i].x -= (min_x - frame);
+		contour_[i].y -= (min_y - frame);
+	}
+	
+	this->contour.clear();
+	this->contour.swap(contour_);
+}
+
 void Cartographer::extractContours(cv::Mat canny) 
 {
 	formatted_log("Start extract contours");
@@ -85,6 +136,7 @@ void Cartographer::getBorder()
 	}
 
 	this->contour = this->contours[index];
+	this->cutImage();
 
 	// TODO: change to one contour and delete drawing
 	// draw contours to source img
