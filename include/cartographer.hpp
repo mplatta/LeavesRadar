@@ -12,6 +12,7 @@ class Cartographer
 {
 private:
 	cv::Mat src;
+	cv::Mat cuted;
 	cv::Mat bordered;
 	std::vector<std::vector<cv::Point> > contours;
 	std::vector<cv::Point>				 contour;
@@ -19,6 +20,7 @@ private:
 
 	void getBorder      ();
 	void shiftHueSpace  (cv::Mat *h, int const shift);
+	void cutImage       ();
 	void extractContours(cv::Mat canny);
 	void binarization   (cv::Mat *img );
 
@@ -27,6 +29,7 @@ public:
 
 	// getters
 	cv::Mat                              getSrc      ()              { return this->src;      };
+	cv::Mat                              getCuted    ()              { return this->cuted;    };
 	cv::Mat                              getBordered ( bool force );
 	std::vector<std::vector<cv::Point> > getContours ()              { return this->contours; };
 	std::vector<cv::Point>				 getContour  ()				 { return this->contour;  };

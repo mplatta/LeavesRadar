@@ -67,19 +67,32 @@ void ThreadPool::worker(int id)
 
 void ThreadPool::all_in_one(void *path, void *not_use)
 {	
+	const int frame = 0;
+
 	cv::Mat tmp;
 	std::string *path_ = (std::string *)path;
 	
 	formatted_log("Start symmetry_worker() for %s", (*path_).c_str());
 
-	cv::Mat image = cv::imread((*path_).c_str(), CV_LOAD_IMAGE_COLOR);
+	cv::Mat image_ = cv::imread((*path_).c_str(), CV_LOAD_IMAGE_COLOR);
 
-	if (image.empty())
+	if (image_.empty())
 	{
 		formatted_err("Could not open or find the image \"%s\"", (*path_).c_str());
 
 		return;
 	}
+	
+//////////////////////////////////////////////////////////////////
+
+	Cartographer *cartographer = new Cartographer();
+	cartographer->setSrcImg(image_);
+	cartographer->makeBorder(true);
+
+	std::vector<cv::Point> contour = cartographer->getContour();
+	cv::Mat image = cartographer->getCuted();
+
+//////////////////////////////////////////////////////////////////
 
 	float rho_divs   = hypotf( image.rows, image.cols ) + 1;
 	float theta_divs = 180.0;
@@ -98,12 +111,6 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 	rec.straightenPoint(starting);
 
 //////////////////////////////////////////////////////////////////
-
-	Cartographer *cartographer = new Cartographer();
-	cartographer->setSrcImg(rec.getImg());
-	cartographer->makeBorder(true);
-
-	std::vector<cv::Point> contour = cartographer->getContour();
 
 	// tmp solution
 	for (size_t i = 0; i < contour.size(); i++)
