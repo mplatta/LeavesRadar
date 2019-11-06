@@ -58,7 +58,8 @@ void Cartographer::cutImage()
 	int min_frame_x = (frame < min_x) ? frame : 0;
 	int min_frame_y = (frame < min_y) ? frame : 0;
 
-	this->cuted = cv::Mat(this->src, cv::Rect(min_x - frame, min_y - frame, max_x - min_x + frame, max_y - min_y + frame));
+	this->cuted = cv::Mat(this->src, cv::Rect( min_x - min_frame_x  , min_y - min_frame_y, 
+		                                       max_x - min_x + max_frame_x, max_y - min_y + max_frame_y));
 
 	for (size_t i = 0; i < contour_.size(); i++)
 	{
