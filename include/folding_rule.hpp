@@ -26,6 +26,7 @@ private:
 	std::vector<cv::Point> points;
 
 	//scaling distance to 0-1 interval and save to histogram
+	void blure               ( )                        ;
 	void scaling             ( double min, double max ) ;
 	void createHistogram     ( double angle )           ;
 	/**
