@@ -25,8 +25,8 @@ $ make scratchpad
 $ make clean
 ```
 
-## How run
-Navigate to bin file and run:
+## How to run
+Navigate to bin/ file and run:
 
 * for generate histogram for all image in path:
 ```sh
@@ -47,7 +47,7 @@ Place to test any indeas and solutions, only for local repo
 # Classificator
 Simple neural network
 
-## How run
+## How to run
 
 * training network
 ```sh
