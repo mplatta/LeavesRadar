@@ -1,5 +1,6 @@
 #include <iostream>
 #include <pthread.h>
+#include <time.h>
 
 #include "dir_functions.hpp"
 #include "formatted_log.hpp"
@@ -40,6 +41,7 @@ void one_image_mode(string file, ThreadPool *pool)
 
 int main( int argc, char** argv ) 
 {
+	clock_t tStart = clock();
 	ThreadPool *pool = new ThreadPool();
 
 	/*	type of start program
@@ -107,8 +109,8 @@ int main( int argc, char** argv )
 				formatted_inf("RUN PROGRAM COMMAND:\nRun all image mode: ./mgr --path ../dir/ [--out] [/path/to/out/dir]\nRun one image mode: ./mgr --file ../dir/image.jpg [--out] [/path/to/out/dir]");
 		}
 	}
-	
-	formatted_inf("PROGRAM EXECUTED");
+
+	formatted_inf("PROGRAM EXECUTED (%.2fs)", (double)(clock() - tStart)/CLOCKS_PER_SEC);
 
 	return 0;
 }
