@@ -104,7 +104,7 @@ int main( int argc, char** argv )
 				one_image_mode(file, pool);
 				break;
 			default :
-				formatted_err("SOMTHING IS NO YES");
+				formatted_inf("RUN PROGRAM COMMAND:\nRun all image mode: ./mgr --path ../dir/ [--out] [/path/to/out/dir]\nRun one image mode: ./mgr --file ../dir/image.jpg [--out] [/path/to/out/dir]");
 		}
 	}
 	
