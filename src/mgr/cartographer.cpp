@@ -21,7 +21,7 @@ void Cartographer::shiftHueSpace(cv::Mat *h, int const shift)
 
 void Cartographer::cutImage()
 {
-	const int frame = 0;
+	const int frame = 30;
 
 	int min_x = this->src.size().width;
 	int min_y = this->src.size().height;
@@ -53,18 +53,21 @@ void Cartographer::cutImage()
 		if (this->contour[i].y > max_y) max_y = this->contour[i].y;
 	}
 
-	int max_frame_x = (max_x + frame < this->src.size().width) ? frame : this->src.size().width;
-	int max_frame_y = (max_y + frame < this->src.size().height) ? frame : this->src.size().height;
-	int min_frame_x = (frame < min_x) ? frame : 0;
-	int min_frame_y = (frame < min_y) ? frame : 0;
+	int min_frame_x = ((min_x - frame) > 0) ? (min_x - frame) : 0;
+	int min_frame_y = ((min_y - frame) > 0) ? (min_y - frame) : 0;
+	int max_frame_x = ((max_x + frame) < this->src.size().width) ? max_x - min_frame_x + frame : this->src.size().width - min_frame_x;
+	int max_frame_y = ((max_y + frame) < this->src.size().height) ? max_y - min_frame_y + frame : this->src.size().height - min_frame_y;
 
-	this->cuted = cv::Mat(this->src, cv::Rect( min_x - min_frame_x  , min_y - min_frame_y, 
-		                                       max_x - min_x + max_frame_x, max_y - min_y + max_frame_y));
+	// formatted_log("min_x: %d, min_y: %d\nmax_x: %d, max_y: %d", min_x, min_y, max_x, max_y);
+	// formatted_log("min_frame_x: %d, min_frame_y: %d\nmax_frame_x: %d, max_frame_y: %d", min_frame_x, min_frame_y, max_frame_x, max_frame_y);
+	// formatted_log("width: %d, height: %d", this->src.size().width, this->src.size().height);
+
+	this->cuted = cv::Mat(this->src.clone(), cv::Rect(min_frame_x, min_frame_y, max_frame_x, max_frame_y));
 
 	for (size_t i = 0; i < contour_.size(); i++)
 	{
-		contour_[i].x -= (min_x - frame);
-		contour_[i].y -= (min_y - frame);
+		contour_[i].x -= min_frame_x;
+		contour_[i].y -= min_frame_y;
 	}
 	
 	this->contour.clear();
