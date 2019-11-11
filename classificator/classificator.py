@@ -83,7 +83,7 @@ def get_random_indicies(data_list):
 
 # fit and evaluate a model
 def evaluate_model(x_train, y_train, x_test, y_test, checkpoint_path):
-    verbose, epochs, batch_size = 1, 10, 10
+    verbose, epochs, batch_size = 1, 20, 10
     cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                  save_weights_only=True,
                                                  verbose=1)
