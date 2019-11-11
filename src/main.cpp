@@ -1,6 +1,7 @@
 #include <iostream>
 #include <pthread.h>
 #include <time.h>
+#include <string>
 
 #include "dir_functions.hpp"
 #include "formatted_log.hpp"
@@ -8,10 +9,10 @@
 
 using namespace cv;
 
+std::vector<String> image_names;
+
 void all_image_mode(std::string file, ThreadPool *pool) 
 {
-	std::vector<string> image_names;
-
 	if (dir_exists(file.c_str()))
 	{
 		glob(delete_last_slash(file) + "/*.png", image_names);
@@ -110,7 +111,7 @@ int main( int argc, char** argv )
 		}
 	}
 
-	formatted_inf("PROGRAM EXECUTED (%.2fs)", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+	formatted_inf("PROGRAM EXECUTED (%.2fs)", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 
 	return 0;
 }

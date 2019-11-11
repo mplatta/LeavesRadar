@@ -58,10 +58,6 @@ void Cartographer::cutImage()
 	int max_frame_x = ((max_x + frame) < this->src.size().width) ? max_x - min_frame_x + frame : this->src.size().width - min_frame_x;
 	int max_frame_y = ((max_y + frame) < this->src.size().height) ? max_y - min_frame_y + frame : this->src.size().height - min_frame_y;
 
-	// formatted_log("min_x: %d, min_y: %d\nmax_x: %d, max_y: %d", min_x, min_y, max_x, max_y);
-	// formatted_log("min_frame_x: %d, min_frame_y: %d\nmax_frame_x: %d, max_frame_y: %d", min_frame_x, min_frame_y, max_frame_x, max_frame_y);
-	// formatted_log("width: %d, height: %d", this->src.size().width, this->src.size().height);
-
 	this->cuted = cv::Mat(this->src.clone(), cv::Rect(min_frame_x, min_frame_y, max_frame_x, max_frame_y));
 
 	for (size_t i = 0; i < contour_.size(); i++)
@@ -142,17 +138,7 @@ void Cartographer::getBorder()
 	this->contour = this->contours[index];
 	this->cutImage();
 
-	// TODO: change to one contour and delete drawing
-	// draw contours to source img
-
-	// for(int i = 0; i < this->contours.size(); ++i)
-	// {
-		// if (cv::contourArea(contours[i]) < 400) continue;	// ignore area smaller than 400
-		// if (hierarchy[i][3] < 0) continue; 					// ignore inside contours
-
-		cv::drawContours(output, this->contours, index,
-						 cv::Scalar(0, 0, 255), 2, 8, this->hierarchy, 0);
-	// }
+	cv::drawContours(output, this->contours, index, cv::Scalar(0, 0, 255), 2, 8, this->hierarchy, 0);
 
 	this->bordered = output;
 }
@@ -168,7 +154,6 @@ void Cartographer::makeBorder(bool force)
 
 void Cartographer::setSrcImg(cv::Mat _src) 
 {
-	//TODO: add some allert
 	if (_src.empty()) 
 	{
 		formatted_err("Image not exist");
@@ -186,8 +171,3 @@ cv::Mat Cartographer::getBordered(bool force)
 
 	return this->bordered;
 }
-
-// Cartographer::Cartographer() 
-// {
-// 	// this->bordered = NULL;
-// }
