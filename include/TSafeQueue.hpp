@@ -1,9 +1,7 @@
 #ifndef _T_SAFE_QUEUE_HPP
 #define _T_SAFE_QUEUE_HPP
 
-// #include <queue>
-// #include <list>
-#include <deque>
+#include <queue>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -12,18 +10,18 @@ template <typename T>
 class TSafeQueue
 {
 private:
-	std::deque<T> queue_;
+	std::queue<T> queue_;
 	std::mutex mutex_;
 	std::condition_variable cond_;
 	unsigned long long id_;
 
 public:
-	// not safe
-	std::deque<T> getQueue() 
-	{
-		return queue_;
-	}
-	// --------
+	// // not safe
+	// std::deque<T> getQueue() 
+	// {
+	// 	return queue_;
+	// }
+	// // --------
 
 
 	T getItem(int i) 
@@ -58,7 +56,7 @@ public:
 		}
 
 		auto item = queue_.front();
-		queue_.pop_front();
+		queue_.pop();
 		
 		return item;
 	}
@@ -78,13 +76,13 @@ public:
 		}
 
 		item = queue_.front();
-		queue_.pop_front();
+		queue_.pop();
 	}
 
 	void push(const T& item)
 	{
 		std::unique_lock<std::mutex> mlock(mutex_);
-		queue_.push_back(item);
+		queue_.push(item);
 		mlock.unlock();
 		cond_.notify_one();
 	}
@@ -92,7 +90,7 @@ public:
 	void push(T&& item)
 	{
 		std::unique_lock<std::mutex> mlock(mutex_);
-		queue_.push_back(std::move(item));
+		queue_.push(std::move(item));
 		mlock.unlock();
 		cond_.notify_one();
 	}
@@ -121,15 +119,15 @@ public:
 		id_ = 0;
 	}
 
-	void update(int index, T& item)
-	{	
-		std::unique_lock<std::mutex> mlock(mutex_);
+	// void update(int index, T& item)
+	// {	
+	// 	std::unique_lock<std::mutex> mlock(mutex_);
 
-		queue_[index] = std::move(item);
+	// 	queue_[index] = std::move(item);
 
-		mlock.unlock();
-		cond_.notify_one();
-	}
+	// 	mlock.unlock();
+	// 	cond_.notify_one();
+	// }
 
 
 

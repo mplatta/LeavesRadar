@@ -25,8 +25,6 @@ int main( int argc, char** argv )
 
 	cv::Mat tmp;
 	std::string path_ = "../img/Lonicera_henryi_12.png";
-	
-	formatted_log("Start symmetry_worker() for %s", path_.c_str());
 
 	cv::Mat image_ = cv::imread(path_.c_str(), CV_LOAD_IMAGE_COLOR);
 

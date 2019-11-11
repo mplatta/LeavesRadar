@@ -12,7 +12,7 @@ void StartingPoint::setImgBin(cv::Mat img){
 	// formatted_log("Size this 2 [%d, %d]", this->img.rows, this->img.cols);
 }
 
-cv::Point2f StartingPoint::getStartingPoint(double percent){
+cv::Point2f StartingPoint::getStartingPoint(double percent) {
 	cv::Point2f a(0.0f, 0.0f), b(0.0f, 0.0f);    
 	int rows = this->img.rows;
 	int cols = this->img.cols;
@@ -68,9 +68,7 @@ cv::Point2f StartingPoint::getStartingPoint(double percent){
 
 			// formatted_log("loop1 %d", i);
 			// formatted_log("Point p [%f, %f]", p.y, p.x);
-			// formatted_err("TTTTTTTTTTTTTTTTUUUUUUUUUUUUU %d, %d:%d", this->img.empty(), this->img.size().width, this->img.size().height);
-			// // formatted_log("this->img.at<uchar>(p) %d", this->img.at<uchar>(p));
-			// formatted_err("ssssssssssssssssssssssssssssssssss: %d", this->img.type());
+			// formatted_log("this->img.at<uchar>(p) %d", this->img.at<uchar>(p));
 			if(p.y > 0 && p.x > 0 && p.y < rows && p.x < cols) {
 				if(this->img.at<uchar>(p) == 0) {
 					b = p;
@@ -80,7 +78,6 @@ cv::Point2f StartingPoint::getStartingPoint(double percent){
 		}    
 
 		for(int i = 0; i < rows; i++){
-			// formatted_err("22222222222222222: %d", this->img.type());
 			cv::Point2f p = getPointOnStraightY(this->str, (double)i);
 
 			// formatted_log("loop2 %d", i);
