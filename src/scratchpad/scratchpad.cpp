@@ -21,22 +21,32 @@ int main( int argc, char** argv )
 {
 	formatted_log("Place for your fun! :*");
 		
-	namedWindow("z1", WINDOW_AUTOSIZE);
+	namedWindow("z1", WINDOW_NORMAL);
 
 	cv::Mat tmp;
-	std::string path_ = "../res/s1.jpg";
+	std::string path_ = "../img/Quercus_robur_46.png";
 	
 	formatted_log("Start symmetry_worker() for %s", path_.c_str());
 
-	cv::Mat image = cv::imread(path_.c_str(), CV_LOAD_IMAGE_COLOR);
+	cv::Mat image_ = cv::imread(path_.c_str(), CV_LOAD_IMAGE_COLOR);
 
-	if (image.empty())
+	if (image_.empty())
 	{
 		formatted_err("Could not open or find the image \"%s\"", path_.c_str());
 
 		// return;
 	}
+//////////////////////////////////////////////////////////////////////////////
+	Cartographer *cartographer = new Cartographer();
+	cartographer->setSrcImg(image_.clone());
+	cartographer->makeBorder(true);
 
+	std::vector<cv::Point> contour = cartographer->getContour();
+	Mat image = cartographer->getCuted().clone();
+
+	imshow("z1", image);
+
+///////////////////////////////////////////////////////////////////////////////
 	float rho_divs   = hypotf( image.rows, image.cols ) + 1;
 	float theta_divs = 180.0;
 
@@ -53,16 +63,17 @@ int main( int argc, char** argv )
 	tmp = rec.straightenImg();
 	rec.straightenPoint(starting);
 
+	// circle(tmp, Point(maxX2, maxY2), 4, Scalar(0,0,255), 3, 1, 0);
 	circle(tmp, starting, 2, Scalar(0,0,255), 2, 1, 0);
 
 
 //////////////////////////////////////////////////////////////////
 
-	Cartographer *cartographer = new Cartographer();
-	cartographer->setSrcImg(rec.getImg());
-	cartographer->makeBorder(true);
+	// Cartographer *cartographer = new Cartographer();
+	// cartographer->setSrcImg(rec.getImg());
+	// cartographer->makeBorder(true);
 
-	std::vector<cv::Point> contour = cartographer->getContour();
+	// std::vector<cv::Point> contour = cartographer->getContour();
 
 	// tmp solution
 	for (size_t i = 0; i < contour.size(); i++)
@@ -70,7 +81,7 @@ int main( int argc, char** argv )
 		Point2f p = contour[i];
 		rec.straightenPoint(p);
 		contour[i] = p;
-		circle(tmp, contour[i], 2, Scalar(0,0,255), 1, 1, 0);
+		circle(tmp, contour[i], 15, Scalar(0,0,255), 1, 1, 0);
 	}
 
 ///////////////////////////////////////////////////////////////////
@@ -102,7 +113,10 @@ int main( int argc, char** argv )
 		file_name + "(test)", angle );
 
 	formatted_inf("End working for: %s", path_.c_str());
-	imshow("z1", tmp);
+
+	resizeWindow("z1", 600, 600);
+	// resizeWindow("z2", 600, 600);;
+	// imshow("z2", tmp);
 
 	// path_ = NULL;
 	delete foldingRule;

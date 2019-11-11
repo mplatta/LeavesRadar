@@ -70,15 +70,16 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 	const int frame = 0;
 
 	cv::Mat tmp;
-	std::string *path_ = (std::string *)path;
+	std::string *_path = (std::string *)path;
+	std::string path_ = std::move(*_path);
 	
-	formatted_log("Start symmetry_worker() for %s", (*path_).c_str());
+	formatted_inf("Start working for: %s", path_.c_str());
 
-	cv::Mat image_ = cv::imread((*path_).c_str(), CV_LOAD_IMAGE_COLOR);
+	cv::Mat image_ = cv::imread(path_.c_str(), CV_LOAD_IMAGE_COLOR);
 
 	if (image_.empty())
 	{
-		formatted_err("Could not open or find the image \"%s\"", (*path_).c_str());
+		formatted_err("Could not open or find the image \"%s\"", path_.c_str());
 
 		return;
 	}
@@ -86,11 +87,11 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 //////////////////////////////////////////////////////////////////
 
 	Cartographer *cartographer = new Cartographer();
-	cartographer->setSrcImg(image_);
+	cartographer->setSrcImg(image_.clone());
 	cartographer->makeBorder(true);
 
 	std::vector<cv::Point> contour = cartographer->getContour();
-	cv::Mat image = cartographer->getCuted();
+	cv::Mat image = cartographer->getCuted().clone();
 
 //////////////////////////////////////////////////////////////////
 
@@ -98,14 +99,14 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 	float theta_divs = 180.0;
 
 	SymmetryDetector detector( image.size(), Size(rho_divs, theta_divs), 1 );
-	pair<cv::Point, cv::Point> symmetry = detector.getResult(image);
+	pair<cv::Point, cv::Point> symmetry = detector.getResult(image.clone());
 
 	straight_t sym = createStraightFrom2Point(symmetry.first, symmetry.second);
 
-	StartingPoint sp(std::move(image), sym);
+	StartingPoint sp(image.clone(), sym);
 	cv::Point2f starting = sp.getStartingPoint(0.5);
 
-	Rectification rec(std::move(image), sym);
+	Rectification rec(image.clone(), sym);
 
 	tmp = rec.straightenImg();
 	rec.straightenPoint(starting);
@@ -124,7 +125,7 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 	const double angle = 0.5;
 	unsigned long long id;
 
-	formatted_log("Start folding_rule_worker() for %s", (*path_).c_str());
+	formatted_log("Start folding_rule_worker() for %s", path_.c_str());
 
 	FoldingRule *foldingRule = new FoldingRule();
 
@@ -132,7 +133,7 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 	foldingRule->setCenter(starting);
 
 	std::vector<double> histogram = foldingRule->getHistogram(angle, false);
-	std::string file_name = extract_name(*path_);
+	std::string file_name = extract_name(path_);
 	
 	ThreadPool::sQueue->getId(&id);
 
@@ -141,9 +142,9 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 	foldingRule->saveHistogram( tmp_name, 
 		file_name + "(" + std::to_string(id) + ")", angle );
 
-	formatted_inf("End working for: %s", (*path_).c_str());
+	formatted_inf("End working for: %s", path_.c_str());
 
-	path_ = NULL;
+	// path_ = NULL;
 	delete foldingRule;
 	delete cartographer;
 }

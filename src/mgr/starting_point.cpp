@@ -23,7 +23,7 @@ cv::Point2f StartingPoint::getStartingPoint(double percent){
 
     if(check.y >= 0 && check.y <= rows){
         // formatted_log("if true");
-
+formatted_log("T1");
         for(int i = cols; i >= 0; i--){
             cv::Point2f p = getPointOnStraightX(this->str, (double)i);
 
@@ -50,22 +50,25 @@ cv::Point2f StartingPoint::getStartingPoint(double percent){
             }
         }        
     }else{
+        formatted_log("T2");
         // formatted_log("if false");
 
         for(int i = rows; i >= 0; i--){
-        	cv::Point2f p = getPointOnStraightY(this->str, (double)i);
+            cv::Point2f p = getPointOnStraightY(this->str, (double)i);
+        formatted_log("T4");
 
             // formatted_log("loop1 %d", i);
             // formatted_log("Point p [%f, %f]", p.y, p.x);
             // formatted_log("this->img.at<uchar>(p) %d", this->img.at<uchar>(p));
-        	
-        	if(this->img.at<uchar>(p) == 0 && p.y >= 0 && p.x >= 0 && p.y <= rows && p.x <= cols){
-        		b = p;
-        		break;
-        	}
+            
+            if(this->img.at<uchar>(p) == 0 && p.y >= 0 && p.x >= 0 && p.y <= rows && p.x <= cols){
+                b = p;
+                break;
+            }
         }    
 
         for(int i = 0; i < rows; i++){
+        formatted_log("T5");
         	cv::Point2f p = getPointOnStraightY(this->str, (double)i);
 
             // formatted_log("loop2 %d", i);
@@ -78,7 +81,7 @@ cv::Point2f StartingPoint::getStartingPoint(double percent){
         	}
         }
     }
-
+    formatted_log("T3");
     // formatted_log("Point a [%f, %f]", a.y, a.x);
     // formatted_log("Point b [%f, %f]", b.y, b.x);
 
