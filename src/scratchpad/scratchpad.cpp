@@ -24,7 +24,7 @@ int main( int argc, char** argv )
 	namedWindow("z1", WINDOW_NORMAL);
 
 	cv::Mat tmp;
-	std::string path_ = "../img/Quercus_robur_46.png";
+	std::string path_ = "../img/Lonicera_henryi_12.png";
 	
 	formatted_log("Start symmetry_worker() for %s", path_.c_str());
 

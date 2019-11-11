@@ -1,25 +1,123 @@
 import sys
+import os
 import csv
 import glob
 import tensorflow as tf
-import matplotlib.pyplot as plt
 from tensorflow import keras
 import numpy as np
 import random
 
 DEFAULT_TRAIN_PATH = "../out"
-DEFAULT_CLASS_PATH = "../calss"
+DEFAULT_CLASS_PATH = "../class"
+CHECKPOINT_PATH = "checkpoints/cp.ckpt"
+
+from numpy import mean
+from numpy import std
+from matplotlib import pyplot as plt
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras.layers import LSTM
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.initializers import TruncatedNormal
 
 
-def extract_names(_name):
-	index = -1
+def load_fileset(path=DEFAULT_TRAIN_PATH):
+    files_dir = glob.glob(path)
+    files_list = []
 
-	for l in range(len(_name) - 1, 0, -1):
-		if (_name[l] == '_'): 
-			index = l
-			break
+    for file in files_dir:
+        with open(file, 'r') as fo:
+            lines = fo.readlines()
+            files_list.append(lines)
+    return files_list
 
-	return _name[:index]
+def get_data_set(files_list, normalized = True):
+    label_list = []
+    data_list = []
+    data_list_normalzed = []
+    for file in files_list:
+        label_list.append(str(file[0].rsplit('_', 1)[0]))
+        data = [float(i.split(';', 2)[1]) for i in file[2:]]
+        if not float('-inf') in data:
+            mean = np.mean(data)
+            std_dev = np.std(data)
+            z_score = np.abs((data - mean) / std_dev)
+            outliers = np.array(np.where(z_score > 3))[0]
+            for ind in outliers:
+                if ind == 0 or ind == (len(data)-1):
+                    data[ind] = mean
+                else:
+                    data[ind] = (data[ind-1] + data[ind+1])/2.0
+            data_normalized = [(x - min(data)) / (max(data) - min(data)) for x in data]
+            data_list.append(data)
+            data_list_normalzed.append(data_normalized)
+    if normalized:
+        return data_list_normalzed, label_list
+    return data_list, label_list
+
+def get_labels_as_vector(label_list):
+    label_map = {}
+    ind = 0
+    uniques = list(set(label_list))
+    for label in uniques:
+        label_map[label] = ind
+        ind+=1
+
+    label_list = list(map(label_map.get, label_list))
+    label_vect = []
+    for label in label_list:
+        vector = np.zeros(len(uniques))
+        vector[label] = 1
+        label_vect.append(vector.tolist())
+    return label_vect
+
+def get_random_indicies(data_list):
+    train_ind = random.sample(range(0, len(data_list)), int(0.8*len(data_list)))
+    test_ind = []
+    for i in range(len(data_list)):
+        if i not in train_ind:
+            test_ind.append(i)
+    return train_ind, test_ind
+
+
+# fit and evaluate a model
+def evaluate_model(x_train, y_train, x_test, y_test, checkpoint_path):
+    verbose, epochs, batch_size = 1, 10, 10
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                 save_weights_only=True,
+                                                 verbose=1)
+
+    n_timesteps, n_outputs = x_train.shape[1], y_train.shape[1]
+    model = Sequential()
+    model.add(LSTM(128, input_shape=(n_timesteps, 1), return_sequences=False, kernel_initializer=TruncatedNormal(stddev=1./2.)))
+    model.add(Dropout(0.5))
+    #model.add(LSTM(128))
+    #model.add(Dropout(0.5))
+    model.add(Dense(32, activation='sigmoid', kernel_initializer=TruncatedNormal(stddev=1./2.)))
+    model.add(Dense(n_outputs, activation='softmax', kernel_initializer=TruncatedNormal(stddev=1./2.)))
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    es = EarlyStopping(monitor='acc', mode='max', min_delta=0.001)
+    # fit network
+    history = model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=epochs, batch_size=batch_size, verbose=verbose, callbacks=[cp_callback]) #, callbacks=[es]
+    # evaluate model
+    _, train_accuracy = model.evaluate(x_train, y_train, batch_size=batch_size, verbose=0)
+    _, accuracy = model.evaluate(x_test, y_test, batch_size=batch_size, verbose=0)
+    return history, accuracy
+
+
+# run an experiment
+def run_experiment(trainX, trainy, testX, testy, checkpoint_path):
+
+    # repeat experiment
+
+    history, score = evaluate_model(trainX, trainy, testX, testy, checkpoint_path)
+    plt.plot(history.history['loss'], label='train')
+    plt.plot(history.history['val_loss'], label='test')
+    plt.legend()
+    plt.show()
+    score = score * 100.0
+    print('>#result: %.3f' % (score))
 
 
 path = ""
@@ -30,6 +128,7 @@ if (len(sys.argv) >= 1):
 	for i in range(1, len(sys.argv)):
 		if ((sys.argv[i] == "--path") and ((len(sys.argv) - 1) >= (i + 1))): path = sys.argv[i + 1]
 		if (sys.argv[i] == "-t"): training = True
+		elif ((sys.argv[i] == "-n") and ((len(sys.argv) - 1) >= (i + 1)) and not training): path = sys.argv[i + 1]
 		if ((sys.argv[i] == "-n") and ((len(sys.argv) - 1) >= (i + 1))): number = sys.argv[i + 1]
 
 if (path == ""): 
@@ -40,90 +139,152 @@ print(training)
 print(path)
 print("Number of species: ", number)
 
-label_in_vector = []
+#label_in_vector = []
 
 if (training):
-	labels = []
-	data = []
+	checkpoint_dir = os.path.dirname(CHECKPOINT_PATH)
 
-	files = [f for f in glob.glob(path + "**/*", recursive=True)]
+	# run the experiment
+	files_list = load_fileset((path + "/*"))
+	data_list, labels_list = get_data_set(files_list)
+	labels_list = get_labels_as_vector(labels_list)
 
-	for f in files:
-		with open(f, 'r') as csvfile:
-			dataset = csv.reader(csvfile, delimiter=';')
+	train_ind, test_ind = get_random_indicies(data_list)
+
+	x_train = np.array([data_list[i] for i in train_ind])
+	x_train = np.expand_dims(x_train, axis=2)
+	y_train = np.array([labels_list[i] for i in train_ind])
+
+	x_test = np.array([data_list[i] for i in test_ind])
+	x_test = np.expand_dims(x_test, axis=2)
+	y_test = np.array([labels_list[i] for i in test_ind])
+
+	run_experiment(x_train, y_train, x_test, y_test, CHECKPOINT_PATH)
+else:
+	pass
+	# Loads the weights
+	# model.load_weights(CHECKPOINT_PATH)
+
+	# # Re-evaluate the model
+	# loss,acc = model.evaluate(test_images,  test_labels, verbose=2)
+	# print("Restored model, accuracy: {:5.2f}%".format(100*acc))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	## OLD VERSIONs
+	# labels = []
+	# data = []
+
+	# files = [f for f in glob.glob(path + "**/*", recursive=True)]
+
+	# for f in files:
+	# 	with open(f, 'r') as csvfile:
+	# 		dataset = csv.reader(csvfile, delimiter=';')
 			
-			ind = 0
-			tmp = []
-			tmp_name = ""
+	# 		ind = 0
+	# 		tmp = []
+	# 		tmp_name = ""
 
-			for row in dataset:
-				if (ind == 0): tmp_name = extract_names(row[0])
-				if (ind > 1): tmp.append(float(row[0]))
-				ind += 1
+	# 		for row in dataset:
+	# 			if (ind == 0): tmp_name = extract_names(row[0])
+	# 			if (ind > 1): tmp.append(float(row[0]))
+	# 			ind += 1
 			
-			data.append(tmp)
-			labels.append(tmp_name)
+	# 		data.append(tmp)
+	# 		labels.append(tmp_name)
 
-	unique = list(set(labels))
+	# unique = list(set(labels))
 
-	label_map = {}
-	ind = 0
+	# label_map = {}
+	# ind = 0
 
-	for u in unique:
-		label_map[u] = ind
-		ind += 1 
+	# for u in unique:
+	# 	label_map[u] = ind
+	# 	ind += 1 
 
-	number_of_labels = np.zeros(int(number))
+	# number_of_labels = np.zeros(int(number))
 
-	for l in labels:
-		# label_vector = np.zeros(int(number))
-		# label_vector[label_map[l]] = 1
-		# number_of_labels[label_map[l]] += 1
-		# label_in_vector.append(label_vector.tolist())
-		label_in_vector.append(label_map[l])
-
-
-	class_names = unique
-	train_images = np.array(data[:300])
-	test_images = np.array(data[300:])
-	train_labels = np.array(label_in_vector[:300])
-	test_labels = np.array(label_in_vector[300:])
-
-	uu = list(set(test_labels))
-
-	label_ma = {}
-	indd = 0
-
-	for u in uu:
-		label_ma[u] = indd
-		indd += 1 
-
-	for t in test_labels:
-		number_of_labels[label_ma[t]] += 1
-
-	model = keras.Sequential([
-	    keras.layers.Dense(720, input_shape=(720,)),
-	    keras.layers.Dense(100, activation='sigmoid'),
-		# keras.layers.SimpleRNN(2, activation='tanh', use_bias=True, kernel_initializer='glorot_uniform', recurrent_initializer='orthogonal', bias_initializer='zeros', kernel_regularizer=None, recurrent_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, recurrent_constraint=None, bias_constraint=None, dropout=0.0, recurrent_dropout=0.0, return_sequences=False, return_state=False, go_backwards=False, stateful=False, unroll=False),
-	    keras.layers.Dense(number, activation='softmax')
-	])
-
-	model.compile(optimizer='RMSprop',
-	              loss='sparse_categorical_crossentropy',
-	              metrics=['accuracy'])
+	# for l in labels:
+	# 	# label_vector = np.zeros(int(number))
+	# 	# label_vector[label_map[l]] = 1
+	# 	# number_of_labels[label_map[l]] += 1
+	# 	# label_in_vector.append(label_vector.tolist())
+	# 	label_in_vector.append(label_map[l])
 
 
-	model.fit(train_images, train_labels, epochs=100)
+	# class_names = unique
+	# train_images = np.array(data[:300])
+	# test_images = np.array(data[300:])
+	# train_labels = np.array(label_in_vector[:300])
+	# test_labels = np.array(label_in_vector[300:])
+
+	# uu = list(set(test_labels))
+
+	# label_ma = {}
+	# indd = 0
+
+	# for u in uu:
+	# 	label_ma[u] = indd
+	# 	indd += 1 
+
+	# for t in test_labels:
+	# 	number_of_labels[label_ma[t]] += 1
+
+	# model = keras.Sequential([
+	#     keras.layers.Dense(720, input_shape=(720,)),
+	#     keras.layers.Dense(100, activation='sigmoid'),
+	# 	# keras.layers.SimpleRNN(2, activation='tanh', use_bias=True, kernel_initializer='glorot_uniform', recurrent_initializer='orthogonal', bias_initializer='zeros', kernel_regularizer=None, recurrent_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, recurrent_constraint=None, bias_constraint=None, dropout=0.0, recurrent_dropout=0.0, return_sequences=False, return_state=False, go_backwards=False, stateful=False, unroll=False),
+	#     keras.layers.Dense(number, activation='softmax')
+	# ])
+
+	# model.compile(optimizer='RMSprop',
+	#               loss='sparse_categorical_crossentropy',
+	#               metrics=['accuracy'])
 
 
-	test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
+	# model.fit(train_images, train_labels, epochs=100)
 
-	print('\nTest accuracy:', test_acc)
+
+	# test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
+
+	# print('\nTest accuracy:', test_acc)
 
 	# data_list = data
 	# labels_list = label_in_vector
 
-	# # ------------------------------------------------------------------------------------------
+	# # --------------------OLDER----------------------------------------------------------------------
 
 	# train_ind = random.sample(range(0, len(data_list)), int(0.8*len(data_list)))
 	# test_ind = []
