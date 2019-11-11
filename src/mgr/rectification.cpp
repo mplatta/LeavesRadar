@@ -4,28 +4,40 @@ void Rectification::computeAngle(){
     if(-360.0 < this->angle && this->angle < 360.0){
         return;
     }
-    //Getting points on symmetry line
-    cv::Point2f first_point = getPointOnStraightY(this->str, this->img.rows);
-    // formatted_log("First point [%f, %f]", first_point.x, first_point.y);
-    cv::Point2f second_point = getPointOnStraightX(this->str, this->img.cols / 2.0);
-    // formatted_log("Second point [%f, %f]", second_point.x, second_point.y);
 
-    //Changing points to vectors
-    std::pair<double, double> vector_AB( second_point.x - first_point.x, second_point.y - first_point.y);
-    std::pair<double, double> vectro_BC( second_point.x - this->img.cols / 2.0, second_point.y - this->img.rows);
+    // formatted_log("A = %f, B = %f, C = %f", this->str.coeff.a, this->str.coeff.b, this->str.coeff.c);
 
-    // formatted_log("vector AB [%f, %f]", vector_AB.first, vector_AB.second);
-    // formatted_log("vectro BC [%f, %f]", vectro_BC.first, vectro_BC.second);
+    if(this->str.coeff.a == 0){
+        this->angle = 90.0;
+    }
+    else if(this->str.coeff.b == 0){
+        this->angle = 0.0;
+    }
+    else{
+        //Getting points on symmetry line
+        cv::Point2f first_point = getPointOnStraightY(this->str, this->img.rows);
+        // formatted_log("First point [%f, %f]", first_point.x, first_point.y);
+        cv::Point2f second_point = getPointOnStraightX(this->str, this->img.cols / 2.0);
+        // formatted_log("Second point [%f, %f]", second_point.x, second_point.y);
+        // formatted_log("A = %f, B = %f, C = %f", this->str.coeff.a, this->str.coeff.b, this->str.coeff.c);
 
-    //Computing angle
-    double angle = (vector_AB.first * vectro_BC.first + vector_AB.second * vectro_BC.second)/
-        (sqrt(vector_AB.first * vector_AB.first + vector_AB.second * vector_AB.second)*
-        sqrt(vectro_BC.first * vectro_BC.first + vectro_BC.second * vectro_BC.second));
-    angle = acos(angle);
-    angle = angle * 180/M_PI;
-    this->angle = angle;
+        //Changing points to vectors
+        std::pair<double, double> vector_AB( second_point.x - first_point.x, second_point.y - first_point.y);
+        std::pair<double, double> vectro_BC( second_point.x - this->img.cols / 2.0, second_point.y - this->img.rows);
 
-    // formatted_log("angle = %f", this->angle);    
+        // formatted_log("vector AB [%f, %f]", vector_AB.first, vector_AB.second);
+        // formatted_log("vectro BC [%f, %f]", vectro_BC.first, vectro_BC.second);
+
+        //Computing angle
+        double angle = (vector_AB.first * vectro_BC.first + vector_AB.second * vectro_BC.second)/
+            (sqrt(vector_AB.first * vector_AB.first + vector_AB.second * vector_AB.second)*
+            sqrt(vectro_BC.first * vectro_BC.first + vectro_BC.second * vectro_BC.second));
+        angle = acos(angle);
+        angle = angle * 180/M_PI;
+        this->angle = angle;
+    }
+
+    formatted_log("angle = %f", this->angle);    
 }
 
 void Rectification::straightenPoint(cv::Point2f &p){

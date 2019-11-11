@@ -55,10 +55,10 @@ int main( int argc, char** argv )
 
 	straight_t sym = createStraightFrom2Point(symmetry.first, symmetry.second);
 
-	StartingPoint sp(std::move(image), sym);
+	StartingPoint sp(image, sym);
 	cv::Point2f starting = sp.getStartingPoint(0.5);
 
-	Rectification rec(std::move(image), sym);
+	Rectification rec(image, sym);
 
 	tmp = rec.straightenImg();
 	rec.straightenPoint(starting);

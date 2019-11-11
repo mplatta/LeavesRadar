@@ -21,11 +21,11 @@ cv::Point2f StartingPoint::getStartingPoint(double percent){
 
 	cv::Point2f check;
 
-	if(this->str.coeff.b == 0){
-		check = getPointOnStraightY(this->str, 0.0);
+	if(this->str.coeff.a == 0){
+		check = getPointOnStraightX(this->str, 0.0);
 	}
 	else{
-		check = getPointOnStraightX(this->str, 0.0);
+		check = getPointOnStraightY(this->str, 0.0);
 	}
 
 	if(check.y >= 0 && check.y <= rows) {
@@ -95,10 +95,19 @@ cv::Point2f StartingPoint::getStartingPoint(double percent){
 		}
 	}
 
-			// formatted_err("111111111111111: %d", this->img.type());
-	// formatted_log("Point a [%f, %f]", a.y, a.x);
-	// formatted_log("Point b [%f, %f]", b.y, b.x);
+	double ysp;
+    cv::Point2f result;
 
-	double ysp = ((b.y - a.y) * percent) + a.y;
-	return getPointOnStraightY(this->str, ysp);
+    if(this->str.coeff.a == 0){
+       ysp = ((b.x - a.x) * percent) + a.x;
+       result = getPointOnStraightX(this->str, ysp);
+    }
+    else{
+        ysp = ((b.y - a.y) * percent) + a.y;
+        result = getPointOnStraightY(this->str, ysp);
+    }	
+
+    formatted_log("Point result [%f, %f]", result.y, result.x);
+
+    return result;
 }
