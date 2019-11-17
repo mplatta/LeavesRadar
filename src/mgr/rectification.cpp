@@ -15,7 +15,7 @@ void Rectification::computeAngle(){
     }
     else{
         //Getting points on symmetry line
-        cv::Point2f first_point = getPointOnStraightY(this->str, this->img.rows);
+        cv::Point2f first_point = getPointOnStraightX(this->str, 0.0);
         // formatted_log("First point [%f, %f]", first_point.x, first_point.y);
         cv::Point2f second_point = getPointOnStraightX(this->str, this->img.cols / 2.0);
         // formatted_log("Second point [%f, %f]", second_point.x, second_point.y);
@@ -86,15 +86,4 @@ cv::Mat Rectification::straightenImg(){
     warpAffine(this->img, dst, rotation_matrix, bbox.size());
 
     return dst;
-}
-
-void Rectification::computingTranslation(){
-    this->computeAngle();
-    
-    cv::Point2f center(this->img.cols / 2.0, this->img.rows / 2.0);
-
-    cv::Rect bbox = cv::RotatedRect(cv::Point2f(), this->img.size(), this->angle).boundingRect();  
-
-    this->translationX = bbox.width / 2.0 - center.x;
-    this->translationY = bbox.height / 2.0 - center.y; 
 }

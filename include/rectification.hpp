@@ -24,7 +24,6 @@ private:
 public:
 	cv::Mat straightenImg();
 	cv::Point2f straightenPoint(cv::Point2f &p);
-	void computingTranslation();
 
 	// getters
 	cv::Mat getImg() {return this->img;};
