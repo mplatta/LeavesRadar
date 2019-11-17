@@ -20,6 +20,7 @@ using namespace cv;
 int main( int argc, char** argv ) 
 {
 	formatted_log("Place for your fun! :*");
+
 		
 	namedWindow("z1", WINDOW_NORMAL);
 
@@ -45,13 +46,9 @@ int main( int argc, char** argv )
 	imshow("z1", image);
 
 ///////////////////////////////////////////////////////////////////////////////
-	float rho_divs   = hypotf( image.rows, image.cols ) + 1;
-	float theta_divs = 180.0;
 
-	SymmetryDetector detector( image.size(), Size(rho_divs, theta_divs), 1 );
-	pair<cv::Point, cv::Point> symmetry = detector.getResult(image);
-
-	straight_t sym = createStraightFrom2Point(symmetry.first, symmetry.second);
+	SymmetryDetector detector( image );
+	straight_t sym = detector.getResult();
 
 	StartingPoint sp(image, sym);
 	cv::Point2f starting = sp.getStartingPoint(0.5);

@@ -1,14 +1,13 @@
 #include "symmetry_detector.hpp"
 
-#define within( val, bottom, top ) ( val > bottom && val < top )
+SymmetryDetector::SymmetryDetector( Mat image ) {
 
-SymmetryDetector::SymmetryDetector( const Size image_size, const Size hough_size, const int rot_resolution ) {
-    this->imageSize     = image_size;
+    this->image         = image.clone();
+    this->imageSize     = image.size();
     this->center        = Point2f( imageSize.width - 1.0, imageSize.height - 1.0 ) * 0.5;
     this->diagonal      = hypotf( imageSize.width, imageSize.height );
-    this->rhoDivision   = diagonal;
-    this->rhoMax        = hough_size.width;
-    this->thetaMax      = hough_size.height;
+    this->rhoMax        = diagonal + 1;
+    this->thetaMax      = 180.0;
     
     rotMatrices.resize( thetaMax, Mat(2, 2, CV_32FC1) );
     
@@ -26,8 +25,8 @@ SymmetryDetector::SymmetryDetector( const Size image_size, const Size hough_size
     }
     
     accum       = Mat::zeros( thetaMax + 2, rhoMax, CV_32FC1 );
-    rotEdges    = Mat::zeros( rhoDivision, diagonal, CV_32FC1 );
-    reRows.resize( rhoDivision );
+    rotEdges    = Mat::zeros( rhoMax - 1, diagonal, CV_32FC1 );
+    reRows.resize( rhoMax - 1 );
 }
 
 /**
@@ -41,7 +40,7 @@ void SymmetryDetector::rotateEdges( vector<Point2f>& edges, int theta ) {
     float r3 = rotMatrices[theta].at<float>(1, 1);
     
     /* Reset our row pointers to start of each row in rotated edges matrix */
-    for( int i = 0; i < rhoDivision; i++ )
+    for( int i = 0; i < rhoMax - 1; i++ )
         reRows[i] = rotEdges.ptr<float>(i);
     
     float half_diag = cvRound(diagonal) * 0.5;
@@ -57,9 +56,8 @@ void SymmetryDetector::rotateEdges( vector<Point2f>& edges, int theta ) {
 /**
  * Create the hough accumulation matrix, and vote for each pair of symmetrical edges
  */
-void SymmetryDetector::vote( Mat& image, int min_pair_dist, int max_pair_dist ) {
-    float min_dist = min_pair_dist * 0.5;
-    float max_dist = max_pair_dist * 0.5;
+void SymmetryDetector::vote( Mat& image, double min_pair_dist) {
+    float min_dist = min_pair_dist * this->rhoMax;   
     
     /* Make sure that we reset the accumulation matrix and rotated edges matrix */
     accum    = Scalar::all(0);
@@ -81,7 +79,7 @@ void SymmetryDetector::vote( Mat& image, int min_pair_dist, int max_pair_dist ) 
         /* Rotate edge to that degree */
         rotateEdges( edges, t );
         
-        for( int i = 0; i < rhoDivision; i++ ) {
+        for( int i = 0; i < rhoMax - 1; i++ ) {
             float * col_start   = rotEdges.ptr<float>(i);
             float * col_end     = reRows[i];
             
@@ -95,7 +93,7 @@ void SymmetryDetector::vote( Mat& image, int min_pair_dist, int max_pair_dist ) 
                 for( float * x1 = x0 + 1; x1 != col_end; x1++ ) {
                     float dist = fabs( *x1 - *x0 );
 
-                    if( !within(dist, min_dist, max_dist) )
+                    if( dist < min_dist )
                         break;
                     
                     int rho_index = static_cast<int>(*x0 + *x1);
@@ -111,36 +109,26 @@ void SymmetryDetector::vote( Mat& image, int min_pair_dist, int max_pair_dist ) 
 /**
  * Find the lines that fit the symmetrical object from the calculated Hough accumulation matrix
  **/
-pair<Point, Point> SymmetryDetector::getResult(Mat frame, float threshold ) {
-    pair<Point, Point> result; 
+straight_t SymmetryDetector::getResult() {
+    straight_t result; 
     Mat temp, edge;   
-    
-    /* Adjustable parameters, depending on the scene condition */
-    int canny_thresh_1 = 150;
-    int canny_thresh_2 = 100;
-    int min_pair_dist  = 25;
-    int max_pair_dist  = 500;
-    int no_of_peaks    = 1; 
 
-    temp = frame.clone();
+    double min_pair_dist  = 0.01;
+
+    temp = this->image.clone();
         
     /* Find the edges */
     cvtColor( temp, edge, CV_BGR2GRAY );
-    Canny( edge, edge, canny_thresh_1, canny_thresh_2 );
+    threshold(edge, edge, 200.0, 255.0, CV_THRESH_BINARY);
+    Canny( edge, edge, 100, 50);
         
     /* Vote for the accumulation matrix */
-    this->vote( edge, min_pair_dist, max_pair_dist );
+    this->vote( edge, min_pair_dist);
     
-    /* Pre-set the size of the neighbors */
-    int rho_neighbors   = rhoMax / 20.0f,
-        theta_neighbors = thetaMax / 20.0f;
-    
-    /* Create a mask to avoid searching peaks around the padding, and for everything that's below the specified
-     threshold */
+    /* Create a mask to avoid searching peaks around the padding */
     Mat mask( accum.size(), CV_8UC1, Scalar(255) );
     mask.row(0)             = Scalar(0);
-    mask.row(mask.rows - 1) = Scalar(0);
-    mask = mask & (accum >= threshold);
+    mask.row(mask.rows - 1) = Scalar(0);    
     
     temp = accum.clone();    
     
@@ -155,6 +143,8 @@ pair<Point, Point> SymmetryDetector::getResult(Mat frame, float threshold ) {
         
     /* Convert from Hough space back to x-y space */
     result = getLine(rho_index, theta_index );
+
+    formatted_log("A = %f, B = %f, C = %f", result.coeff.a, result.coeff.b, result.coeff.c);
     
     return result;
 }
@@ -164,7 +154,9 @@ pair<Point, Point> SymmetryDetector::getResult(Mat frame, float threshold ) {
  * Return a pair of points that describe the line based on the given
  * rho and theta in the Hough space
  */
-pair<Point, Point> SymmetryDetector::getLine( float rho_index, float theta_index ) {
+straight_t SymmetryDetector::getLine( float rho_index, float theta_index ) {
+    straight_t result;
+
     float half_rho_max   = rhoMax * 0.5f;
     float half_theta_max = thetaMax * 0.5f;
     
@@ -211,6 +203,10 @@ pair<Point, Point> SymmetryDetector::getLine( float rho_index, float theta_index
     }
     
     Point p1( min_d * sin_theta + x_r, -min_d * cos_theta + y_r );
+
+    result = createStraightFrom2Point (p0, p1);
+
+    // formatted_log("A = %f, B = %f, C = %f", result.coeff.a, result.coeff.b, result.coeff.c);
     
-    return pair<Point, Point> { p0, p1, };
+    return result;
 }

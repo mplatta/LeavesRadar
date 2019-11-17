@@ -174,7 +174,7 @@ cv::Point *FoldingRule::getIntersect(cv::Point A, cv::Point B, cv::Point C, cv::
 	straight_t a = createStraightFrom2Point(A, B);
 	straight_t b = createStraightFrom2Point(C, D);
 
-	p = isIntersectStright_t(a, b);
+	p = isIntersectStraight_t(a, b);
 
 	return p;
 }

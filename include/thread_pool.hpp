@@ -2,6 +2,7 @@
 #define _THREAD_POOL_HPP_
 
 #include <thread>
+#include <string>
 
 #include "TSafeQueue.hpp"
 #include "store_queue.hpp"
@@ -25,7 +26,7 @@ private:
 	// NOT USED, SAVE FOR FUTURE
 	// static TSafeQueue<Entity>      *entities;
 
-	static std::string _out_path;
+	static String _out_path;
 
 	static bool stop_flag;
 	static bool	*stop_flags;
@@ -45,9 +46,9 @@ public:
 
 	// getters/setters
 	static TSafeQueue<store_queue> *getSQueue() { return ThreadPool::sQueue;    };
-	static std::string             getOutPath() { return ThreadPool::_out_path; };
+	static String             getOutPath() { return ThreadPool::_out_path; };
 
-	static void setOutPath ( std::string out_path ) { ThreadPool::_out_path = out_path; };
+	static void setOutPath ( String out_path ) { ThreadPool::_out_path = out_path; };
 
 	ThreadPool()  { ThreadPool::stop_flag = false; ThreadPool::sQueue = new TSafeQueue<store_queue>();
 	                stop_flags = new bool[NUM_THREADS];
