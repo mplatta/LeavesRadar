@@ -23,7 +23,8 @@ class ThreadPool
 {
 private:
 	static TSafeQueue<store_queue> *sQueue;
-	static TSafeQueue<Entity>      *entities;
+	// NOT USED, SAVE FOR FUTURE
+	// static TSafeQueue<Entity>      *entities;
 
 	static String _out_path;
 
@@ -31,9 +32,10 @@ private:
 	static bool	*stop_flags;
 	
 	static void worker              ( int   id                     ) ;
-	static void folding_rule_worker ( void *contour, void *size    ) ;
-	static void cartographer_worker ( void *path   , void *not_use ) ;
-	static void symmetry_worker     ( void *path   , void *not_use ) ;
+	// NOT USED, SAVE FOR FUTURE
+	// static void folding_rule_worker ( void *contour, void *size    ) ;
+	// static void cartographer_worker ( void *path   , void *not_use ) ;
+	// static void symmetry_worker     ( void *path   , void *not_use ) ;
 	static void all_in_one          ( void *path   , void *not_use ) ;
 
 	static void	set_starts_value	();
@@ -49,8 +51,8 @@ public:
 	static void setOutPath ( String out_path ) { ThreadPool::_out_path = out_path; };
 
 	ThreadPool()  { ThreadPool::stop_flag = false; ThreadPool::sQueue = new TSafeQueue<store_queue>();
-	                ThreadPool::entities = new TSafeQueue<Entity>(); stop_flags = new bool[NUM_THREADS];
-	                ThreadPool::set_starts_value(); ThreadPool::_out_path = "../out"; };
+	                stop_flags = new bool[NUM_THREADS];
+	                ThreadPool::set_starts_value(); ThreadPool::_out_path = "../out"; }; //ThreadPool::entities = new TSafeQueue<Entity>(); 
 	~ThreadPool() {};
 	
 };

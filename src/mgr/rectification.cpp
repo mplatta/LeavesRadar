@@ -37,7 +37,7 @@ void Rectification::computeAngle(){
         this->angle = angle;
     }
 
-    // formatted_log("angle = %f", this->angle);    
+    // formatted_log("angle = %f", this->angle);
 }
 
 cv::Point2f Rectification::straightenPoint(cv::Point2f &p){

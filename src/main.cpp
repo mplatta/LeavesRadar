@@ -111,7 +111,7 @@ int main( int argc, char** argv )
 		}
 	}
 
-	formatted_inf("PROGRAM EXECUTED (%.2fs)", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+	formatted_inf("PROGRAM EXECUTED (%.2fs)", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 
 	return 0;
 }

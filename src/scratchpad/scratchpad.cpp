@@ -25,9 +25,7 @@ int main( int argc, char** argv )
 	namedWindow("z1", WINDOW_NORMAL);
 
 	cv::Mat tmp;
-	std::string path_ = "aaa.png";
-	
-	formatted_log("Start symmetry_worker() for %s", path_.c_str());
+	std::string path_ = "../img/Lonicera_henryi_12.png";
 
 	cv::Mat image_ = cv::imread(path_.c_str(), CV_LOAD_IMAGE_COLOR);
 
@@ -52,10 +50,10 @@ int main( int argc, char** argv )
 	SymmetryDetector detector( image );
 	straight_t sym = detector.getResult();
 
-	StartingPoint sp((image), sym);
+	StartingPoint sp(image, sym);
 	cv::Point2f starting = sp.getStartingPoint(0.5);
 
-	Rectification rec((image), sym);
+	Rectification rec(image, sym);
 
 	tmp = rec.straightenImg();
 	rec.straightenPoint(starting);
