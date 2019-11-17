@@ -23,7 +23,7 @@ private:
 
 public:
 	cv::Mat straightenImg();
-	cv::Point2f straightenPoint(cv::Point2f p);
+	cv::Point2f straightenPoint(cv::Point2f &p);
 	void computingTranslation();
 
 	// getters

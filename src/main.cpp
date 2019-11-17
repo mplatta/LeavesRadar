@@ -1,6 +1,7 @@
 #include <iostream>
 #include <pthread.h>
 #include <time.h>
+#include <string>
 
 #include "dir_functions.hpp"
 #include "formatted_log.hpp"
@@ -8,9 +9,9 @@
 
 using namespace cv;
 
-void all_image_mode(std::string file, ThreadPool *pool) 
+void all_image_mode(String file, ThreadPool *pool) 
 {
-	std::vector<string> image_names;
+	std::vector<String> image_names;
 
 	if (dir_exists(file.c_str()))
 	{
@@ -31,7 +32,7 @@ void all_image_mode(std::string file, ThreadPool *pool)
 	}
 }
 
-void one_image_mode(string file, ThreadPool *pool) 
+void one_image_mode(String file, ThreadPool *pool) 
 {
 	formatted_inf("%s", file.c_str());
 	pool->getSQueue()->push( { NULL, &file, NULL } );
@@ -49,8 +50,8 @@ int main( int argc, char** argv )
 		2 - run program for one img
 	*/
 	int flag = 0;
-	std::string file = "";
-	std::string out_file = "";
+	String file = "";
+	String out_file = "";
 
 	if (argc > 1) 
 	{

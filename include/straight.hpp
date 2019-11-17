@@ -19,7 +19,7 @@ typedef union Straight_t
 } straight_t;
 
 static straight_t createStraightFrom2Point ( cv::Point  A, cv::Point  B );
-static cv::Point  *isIntersectStright_t    ( straight_t A, straight_t B );
+static cv::Point  *isIntersectStraight_t    ( straight_t A, straight_t B );
 static cv::Point2f getPointOnStraightY( straight_t A, double y );
 static cv::Point2f getPointOnStraightX( straight_t A, double x );
 
@@ -53,7 +53,7 @@ static cv::Point2f getPointOnStraightX(straight_t A, double x){
 	return result;
 }
 
-static cv::Point *isIntersectStright_t(straight_t A, straight_t B) 
+static cv::Point *isIntersectStraight_t(straight_t A, straight_t B) 
 {
 	double det = ( A.coeff.a * B.coeff.b ) - 
 	             ( B.coeff.a * A.coeff.b );

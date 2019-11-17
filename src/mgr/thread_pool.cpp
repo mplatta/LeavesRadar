@@ -2,7 +2,7 @@
 
 TSafeQueue<store_queue> *ThreadPool::sQueue;
 TSafeQueue<Entity>      *ThreadPool::entities;
-std::string              ThreadPool::_out_path;
+String              	 ThreadPool::_out_path;
 bool					 ThreadPool::stop_flag;
 bool					*ThreadPool::stop_flags;
 
@@ -70,8 +70,8 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 	const int frame = 0;
 
 	cv::Mat tmp;
-	std::string *_path = (std::string *)path;
-	std::string path_ = std::move(*_path);
+	String *_path = (String *)path;
+	String path_ = std::move(*_path);
 	
 	formatted_inf("Start working for: %s", path_.c_str());
 
@@ -95,13 +95,8 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 
 //////////////////////////////////////////////////////////////////
 
-	float rho_divs   = hypotf( image.rows, image.cols ) + 1;
-	float theta_divs = 180.0;
-
-	SymmetryDetector detector( image.size(), Size(rho_divs, theta_divs), 1 );
-	pair<cv::Point, cv::Point> symmetry = detector.getResult(image.clone());
-
-	straight_t sym = createStraightFrom2Point(symmetry.first, symmetry.second);
+	SymmetryDetector detector( image.clone() );
+	straight_t sym = detector.getResult();
 
 	StartingPoint sp(image.clone(), sym);
 	cv::Point2f starting = sp.getStartingPoint(0.5);
@@ -133,11 +128,11 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 	foldingRule->setCenter(starting);
 
 	std::vector<double> histogram = foldingRule->getHistogram(angle, false);
-	std::string file_name = extract_name(path_);
+	String file_name = extract_name(path_);
 	
 	ThreadPool::sQueue->getId(&id);
 
-	std::string tmp_name = delete_last_slash(ThreadPool::_out_path);
+	String tmp_name = delete_last_slash(ThreadPool::_out_path);
 
 	foldingRule->saveHistogram( tmp_name, 
 		file_name + "(" + std::to_string(id) + ")", angle );
@@ -154,7 +149,7 @@ void ThreadPool::folding_rule_worker(void *path, void *not_use)
 	const double angle = 0.5;
 	Entity *e;
 	
-	std::string *path_ = (std::string *)path;
+	String *path_ = (String *)path;
 	formatted_log("Start folding_rule_worker() for %s", (*path_).c_str());
 
 	for (size_t i = 0; i < entities->size(); i++) {
@@ -176,12 +171,12 @@ void ThreadPool::folding_rule_worker(void *path, void *not_use)
 	foldingRule->setCenter(e->getPointZero());
 
 	std::vector<double> histogram = foldingRule->getHistogram(angle, false);
-	std::string file_name = extract_name(*path_);
+	String file_name = extract_name(*path_);
 	unsigned long long id;
 	
 	ThreadPool::sQueue->getId(&id);
 
-	std::string tmp = delete_last_slash(ThreadPool::_out_path);
+	String tmp = delete_last_slash(ThreadPool::_out_path);
 
 	foldingRule->saveHistogram( tmp, 
 		file_name + "(" + std::to_string(id) + ")", angle );
@@ -196,7 +191,7 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 {
 	Entity *e;
 	
-	std::string *path_ = (std::string *)path;
+	String *path_ = (String *)path;
 
 	formatted_log("Start cartographer_worker() for %s", (*path_).c_str());
 
@@ -267,7 +262,7 @@ void ThreadPool::cartographer_worker(void *path, void *not_use)
 void ThreadPool::symmetry_worker(void *path, void *not_use)
 {
 	cv::Mat tmp;
-	std::string *path_ = (std::string *)path;
+	String *path_ = (String *)path;
 	
 	formatted_log("Start symmetry_worker() for %s", (*path_).c_str());
 
@@ -280,13 +275,8 @@ void ThreadPool::symmetry_worker(void *path, void *not_use)
 		return;
 	}
 
-	float rho_divs   = hypotf( image.rows, image.cols ) + 1;
-	float theta_divs = 180.0;
-
-	SymmetryDetector detector( image.size(), Size(rho_divs, theta_divs), 1 );
-	pair<cv::Point, cv::Point> symmetry = detector.getResult(image);
-
-	straight_t sym = createStraightFrom2Point(symmetry.first, symmetry.second);
+	SymmetryDetector detector( image );
+	straight_t sym = detector.getResult();
 
 	StartingPoint sp(std::move(image), sym);
 	cv::Point2f starting = sp.getStartingPoint(0.5);
