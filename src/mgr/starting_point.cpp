@@ -29,7 +29,7 @@ cv::Point2f StartingPoint::getStartingPoint(double percent) {
 		check = getPointOnStraightY(this->str, 0.0);
 	}
 
-	if(check.x >= 0 && check.x <= cols && this->str.coeff.b != 0) {
+	if(this->str.coeff.b <= this->str.coeff.a && this->str.coeff.b != 0) {
 		// formatted_log("if true");
 
 		for(int i = cols; i >= 0; i--) {
@@ -40,7 +40,7 @@ cv::Point2f StartingPoint::getStartingPoint(double percent) {
 			// formatted_log("this->img.at<uchar>(p) %d", this->img.at<uchar>(p));
 			if(p.y > 0 && p.x > 0 && p.y < rows && p.x < cols)
 			{
-				if(this->img.at<uchar>(p) == 0) {
+				if(this->img.at<uchar>(p) > 0) {
 					b = p;
 					break;
 				}
@@ -55,7 +55,7 @@ cv::Point2f StartingPoint::getStartingPoint(double percent) {
 			// formatted_log("this->img.at<uchar>(p) %d", this->img.at<uchar>(p));
 			if(p.y > 0 && p.x > 0 && p.y < rows && p.x < cols)
 			{
-				if(this->img.at<uchar>(p) == 0) {
+				if(this->img.at<uchar>(p) > 0) {
 					a = p;
 					break;
 				}
@@ -71,7 +71,7 @@ cv::Point2f StartingPoint::getStartingPoint(double percent) {
 			// formatted_log("Point p [%f, %f]", p.y, p.x);
 			// formatted_log("this->img.at<uchar>(p) %d", this->img.at<uchar>(p));
 			if(p.y > 0 && p.x > 0 && p.y < rows && p.x < cols) {
-				if(this->img.at<uchar>(p) == 0) {
+				if(this->img.at<uchar>(p) > 0) {
 					b = p;
 					break;
 				}
@@ -85,27 +85,13 @@ cv::Point2f StartingPoint::getStartingPoint(double percent) {
 			// formatted_log("Point p [%f, %f]", p.y, p.x);
 			// formatted_log("this->img.at<uchar>(p) %d", this->img.at<uchar>(p));
 			if(p.y > 0 && p.x > 0 && p.y < rows && p.x < cols) {
-				if(this->img.at<uchar>(p) == 0) {
+				if(this->img.at<uchar>(p) > 0) {
 					a = p;
 					break;
 				}
 			}
 		}
 	}
-
-	double ysp;
-    cv::Point2f result;
-
-    if(this->str.coeff.a == 0){
-       ysp = ((b.x - a.x) * percent) + a.x;
-       result = getPointOnStraightX(this->str, ysp);
-    }
-    else{
-        ysp = ((b.y - a.y) * percent) + a.y;
-        result = getPointOnStraightY(this->str, ysp);
-    }	
-
-    formatted_log("Point result [%f, %f]", result.y, result.x);
 
 	cv::Point2f result; 
 
@@ -116,7 +102,9 @@ cv::Point2f StartingPoint::getStartingPoint(double percent) {
 	else{
 		double xsp = ((b.x - a.x) * percent) + a.x;
 		result = getPointOnStraightX(this->str, xsp);
-	}	
+	}
+
+	formatted_log("Point result [%f, %f]", result.y, result.x);
 
 	return result;
 }
