@@ -22,6 +22,7 @@ void Cartographer::shiftHueSpace(cv::Mat *h, int const shift)
 void Cartographer::cutImage()
 {
 	const int frame = 30;
+	const float allow_diff = 0.15;
 
 	int min_x = this->src.size().width;
 	int min_y = this->src.size().height;
@@ -35,15 +36,17 @@ void Cartographer::cutImage()
 		int b = (i + this->contour.size() - 1) % this->contour.size();
 		int n = (i + 1) % this->contour.size();
 		float avX = ((this->contour[b].x + this->contour[n].x) / 2);
-		float avY = ((this->contour[n].y + this->contour[n].y) / 2);
+		float avY = ((this->contour[b].y + this->contour[n].y) / 2);
 
-		if ( ((this->contour[i].x / avX) - 1 > 0.15) || 
-			 ((this->contour[i].y / avY) - 1 > 0.15) )
+		if ( ((this->contour[i].x / avX) - 1 > allow_diff) || 
+			 ((this->contour[i].y / avY) - 1 > allow_diff) )
 		{
-			formatted_war("Some contour point is different from its neighbors by more than 15%");
+			formatted_war("Some contour point is different from its neighbors by more than %f", allow_diff * 100);
+			// if ((this->contour[i].x / avX) - 1 > allow_diff) this->contour[i].x = avX;
+			// if ((this->contour[i].y / avY) - 1 > allow_diff) this->contour[i].y = avY;
 			continue;
-		}
-
+		} 
+		
 		contour_.push_back(this->contour[i]);
 
 		if (this->contour[i].x < min_x) min_x = this->contour[i].x;
