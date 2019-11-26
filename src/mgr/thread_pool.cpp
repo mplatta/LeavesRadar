@@ -109,7 +109,7 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 	Rectification rec(image.clone(), sym);
 
 	tmp = rec.straightenImg();
-	rec.straightenPoint(starting);
+	starting = rec.straightenPoint(starting);
 
 //////////////////////////////////////////////////////////////////
 
@@ -117,8 +117,7 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 	for (size_t i = 0; i < contour.size(); i++)
 	{
 		Point2f p = contour[i];
-		rec.straightenPoint(p);
-		contour[i] = p;
+		contour[i] = rec.straightenPoint(p);
 	}
 
 //////////////////////////// FOLDING RULE /////////////////////////////////////
