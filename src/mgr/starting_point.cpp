@@ -41,7 +41,7 @@ cv::Point2f StartingPoint::getStartingPoint(double percent) {
 			// formatted_log("this->img.at<uchar>(p) %d", this->img.at<uchar>(p));
 			if(p.y > 0 && p.x > 0 && p.y < rows && p.x < cols)
 			{
-				if(this->img.at<uchar>(p) > 0) {
+				if(this->img.at<uchar>(p) == 0) {
 					b = p;
 					break;
 				}
@@ -56,7 +56,7 @@ cv::Point2f StartingPoint::getStartingPoint(double percent) {
 			// formatted_log("this->img.at<uchar>(p) %d", this->img.at<uchar>(p));
 			if(p.y > 0 && p.x > 0 && p.y < rows && p.x < cols)
 			{
-				if(this->img.at<uchar>(p) > 0) {
+				if(this->img.at<uchar>(p) == 0) {
 					a = p;
 					break;
 				}
@@ -72,7 +72,7 @@ cv::Point2f StartingPoint::getStartingPoint(double percent) {
 			// formatted_log("Point p [%f, %f]", p.y, p.x);
 			// formatted_log("this->img.at<uchar>(p) %d", this->img.at<uchar>(p));
 			if(p.y > 0 && p.x > 0 && p.y < rows && p.x < cols) {
-				if(this->img.at<uchar>(p) > 0) {
+				if(this->img.at<uchar>(p) == 0) {
 					b = p;
 					break;
 				}
@@ -86,7 +86,7 @@ cv::Point2f StartingPoint::getStartingPoint(double percent) {
 			// formatted_log("Point p [%f, %f]", p.y, p.x);
 			// formatted_log("this->img.at<uchar>(p) %d", this->img.at<uchar>(p));
 			if(p.y > 0 && p.x > 0 && p.y < rows && p.x < cols) {
-				if(this->img.at<uchar>(p) > 0) {
+				if(this->img.at<uchar>(p) == 0) {
 					a = p;
 					break;
 				}
