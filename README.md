@@ -1,4 +1,4 @@
-# mgr
+# LeavesRadar
 Program to extract contours from leaves and cast it to histograms
 
 cartographer - class to find and hold contours<br/>
@@ -30,12 +30,12 @@ Navigate to bin/ file and run:
 
 * for generate histogram for all image in path:
 ```sh
-$ ./mgr --path ../dir/ [--out] [/path/to/out/dir]
+$ ./leavesradar --path ../dir/ [--out] [/path/to/out/dir]
 ```
 
 * for generate histogram from one image:
 ```sh
-$ ./mgr --file ../dir/image.jpg [--out] [/path/to/out/dir]
+$ ./leavesradar --file ../dir/image.jpg [--out] [/path/to/out/dir]
 ```
 
 Default out path is /out

@@ -42,6 +42,8 @@ void one_image_mode(String file, ThreadPool *pool)
 
 int main( int argc, char** argv ) 
 {
+	formatted_inf("-----------!! WELCOME IN LEAVESRADAR !!-----------");
+
 	clock_t tStart = clock();
 	ThreadPool *pool = new ThreadPool();
 
@@ -87,7 +89,7 @@ int main( int argc, char** argv )
 
 	if (flag == 0)
 	{
-		formatted_inf("RUN PROGRAM COMMAND:\nRun all image mode: ./mgr --path ../dir/ [--out] [/path/to/out/dir]\nRun one image mode: ./mgr --file ../dir/image.jpg [--out] [/path/to/out/dir]");
+		formatted_inf("RUN PROGRAM COMMAND:\nRun all image mode: ./leavesradar --path ../dir/ [--out] [/path/to/out/dir]\nRun one image mode: ./leavesradar --file ../dir/image.jpg [--out] [/path/to/out/dir]");
 	}
 	else 
 	{
@@ -107,11 +109,11 @@ int main( int argc, char** argv )
 				one_image_mode(file, pool);
 				break;
 			default :
-				formatted_inf("RUN PROGRAM COMMAND:\nRun all image mode: ./mgr --path ../dir/ [--out] [/path/to/out/dir]\nRun one image mode: ./mgr --file ../dir/image.jpg [--out] [/path/to/out/dir]");
+				formatted_inf("RUN PROGRAM COMMAND:\nRun all image mode: ./leavesradar --path ../dir/ [--out] [/path/to/out/dir]\nRun one image mode: ./leavesradar --file ../dir/image.jpg [--out] [/path/to/out/dir]");
 		}
 	}
 
-	formatted_inf("PROGRAM EXECUTED (%.2fs)", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+	formatted_inf("LEAVESRADAR EXECUTED (%.2fs)", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 
 	return 0;
 }

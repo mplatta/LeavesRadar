@@ -25,7 +25,7 @@ int main( int argc, char** argv )
 	namedWindow("z1", WINDOW_NORMAL);
 
 	cv::Mat tmp;
-	std::string path_ = "../img/Lonicera_henryi_12.png";
+	std::string path_ = "../img/Quercus_robur_11.png";
 
 	cv::Mat image_ = cv::imread(path_.c_str(), CV_LOAD_IMAGE_COLOR);
 
@@ -56,7 +56,7 @@ int main( int argc, char** argv )
 	Rectification rec(image, sym);
 
 	tmp = rec.straightenImg();
-	rec.straightenPoint(starting);
+	starting = rec.straightenPoint(starting);
 
 	// circle(tmp, Point(maxX2, maxY2), 4, Scalar(0,0,255), 3, 1, 0);
 	circle(tmp, starting, 2, Scalar(0,0,255), 2, 1, 0);
@@ -74,7 +74,7 @@ int main( int argc, char** argv )
 	for (size_t i = 0; i < contour.size(); i++)
 	{
 		Point2f p = contour[i];
-		rec.straightenPoint(p);
+		p = rec.straightenPoint(p);
 		contour[i] = p;
 		circle(tmp, contour[i], 15, Scalar(0,0,255), 1, 1, 0);
 	}

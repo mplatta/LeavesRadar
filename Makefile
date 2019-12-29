@@ -1,4 +1,4 @@
-PROG	= bin/mgr
+PROG	= bin/leavesradar
 SCRATCH	= bin/scratchpad
 CXX		= g++
 OPTS	= -std=c++11 -g -Wall
@@ -7,7 +7,7 @@ CFLAGS	= $(OPTS)
 INCDIR	= ./include
 OBJDIR	= ./obj
 BINDIR	= ./bin
-SRCDIR	= ./src/mgr
+SRCDIR	= ./src/leavesradar
 
 CFLAGS	+= -I$(INCDIR) -I$(SRCDIR)
 
