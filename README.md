@@ -35,7 +35,7 @@ $ ./leavesradar --path ../dir/ [--out] [/path/to/out/dir]
 
 * for generate histogram from one image:
 ```sh
-$ ./leavesradar --file ../dir/image.jpg [--out] [/path/to/out/dir]
+$ ./leavesradar --file ../dir/image.png [--out] [/path/to/out/dir]
 ```
 
 Default out path is /out
