@@ -22,7 +22,7 @@ void Cartographer::shiftHueSpace(cv::Mat *h, int const shift)
 void Cartographer::cutImage()
 {
 	const int frame = 30;
-	const float allow_diff = 0.15;
+	const float allow_diff = 0.30;
 
 	int min_x = this->src.size().width;
 	int min_y = this->src.size().height;
@@ -38,8 +38,8 @@ void Cartographer::cutImage()
 		float avX = ((this->contour[b].x + this->contour[n].x) / 2);
 		float avY = ((this->contour[b].y + this->contour[n].y) / 2);
 
-		if ( ((this->contour[i].x / avX) - 1 > allow_diff) || 
-			 ((this->contour[i].y / avY) - 1 > allow_diff) )
+		if ( (abs((this->contour[i].x / avX) - 1) > allow_diff) || 
+			 (abs((this->contour[i].y / avY) - 1) > allow_diff) )
 		{
 			formatted_war("Some contour point is different from its neighbors by more than %f", allow_diff * 100);
 			// if ((this->contour[i].x / avX) - 1 > allow_diff) this->contour[i].x = avX;
