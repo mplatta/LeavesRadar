@@ -9,7 +9,7 @@ void FoldingRule::blure()
 
 		float av = ((this->histogram[b] + this->histogram[n]) / 2);
 
-		if ((this->histogram[i] / av - 1.) < 0.15) 
+		if (abs(this->histogram[i] / av - 1.) < 0.15) 
 		{
 			this->histogram[i] = av;
 			continue;
@@ -34,9 +34,9 @@ void FoldingRule::blure()
 	}
 }
 
-void FoldingRule::scaling(double min, double max)
+void FoldingRule::normalize(double min, double max)
 {
-	formatted_log("Scaling histogram");
+	formatted_log("Normalize histogram");
 
 	for (size_t i = 0; i < this->histogram.size(); ++i) 
 	{
@@ -81,7 +81,7 @@ void FoldingRule::createHistogram(double angle)
 	formatted_log("histogram size: %d", this->histogram.size());
 
 	this->blure();
-	this->scaling(0.0, max);
+	this->normalize(0.0, max);
 }
 
 // void FoldingRule::createHistogram2(double angle, cv::Mat img, std::string name) 

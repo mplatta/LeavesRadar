@@ -22,7 +22,7 @@ void Cartographer::shiftHueSpace(cv::Mat *h, int const shift)
 void Cartographer::cutImage()
 {
 	const int frame = 30;
-	const float allow_diff = 0.30;
+	const float allow_diff = 0.15;
 
 	int min_x = this->src.size().width;
 	int min_y = this->src.size().height;
