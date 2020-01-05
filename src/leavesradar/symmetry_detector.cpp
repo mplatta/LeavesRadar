@@ -113,7 +113,7 @@ straight_t SymmetryDetector::getResult() {
     straight_t result; 
     Mat temp, edge;   
 
-    double min_pair_dist  = 0.01;
+    double min_pair_dist  = 0.05;
 
     temp = this->image.clone();
         
