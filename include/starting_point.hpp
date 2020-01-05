@@ -16,7 +16,7 @@ private:
 	cv::Mat img;	
 	Straight_t str;	
 
-	void setImgEdge(cv::Mat img);
+	void setImgBin(cv::Mat img);
 public:
 	cv::Point2f getStartingPoint(double percent);	
 
@@ -25,11 +25,11 @@ public:
 	Straight_t getStr() {return this->str;};
 	
 	// setters
-	void setImg  (cv::Mat img) { this->setImgEdge(img);};
+	void setImg  (cv::Mat img) { this->setImgBin(img);};
 	void setStr  (Straight_t str) {this->str = str;};
 
 	StartingPoint () {};
-	StartingPoint (cv::Mat img, Straight_t str) {this->setImgEdge(img); this->str = str;};
+	StartingPoint (cv::Mat img, Straight_t str) {this->setImgBin(img); this->str = str;};
 	~StartingPoint() {};
 };
 
