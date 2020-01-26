@@ -91,7 +91,7 @@ void ThreadPool::all_in_one(void *path, void *not_use)
 	cartographer->makeBorder(true);
 
 	std::vector<cv::Point> contour = cartographer->getContour();
-	cv::Mat image = cartographer->getCuted().clone();
+	cv::Mat image = cartographer->getCutted().clone();
 
 ///////////////////////// SYMMETRY DETECTOR ////////////////////////////////////
 

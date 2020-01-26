@@ -12,7 +12,7 @@ class Cartographer
 {
 private:
 	cv::Mat src;
-	cv::Mat cuted;
+	cv::Mat cutted;
 	cv::Mat bordered;
 	std::vector<std::vector<cv::Point> > contours;
 	std::vector<cv::Point>				 contour;
@@ -29,7 +29,7 @@ public:
 
 	// getters
 	cv::Mat                              getSrc      ()              { return this->src;      };
-	cv::Mat                              getCuted    ()              { return this->cuted;    };
+	cv::Mat                              getCutted    ()             { return this->cutted;   };
 	cv::Mat                              getBordered ( bool force );
 	std::vector<std::vector<cv::Point> > getContours ()              { return this->contours; };
 	std::vector<cv::Point>				 getContour  ()				 { return this->contour;  };

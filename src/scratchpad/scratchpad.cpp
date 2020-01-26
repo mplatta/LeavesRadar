@@ -25,7 +25,8 @@ int main( int argc, char** argv )
 	namedWindow("z1", WINDOW_NORMAL);
 
 	cv::Mat tmp;
-	std::string path_ = "../img/Quercus_robur_11.png";
+	std::string path_ = "../acer_scan.png";
+	// std::string path_ = "../a.png";
 
 	cv::Mat image_ = cv::imread(path_.c_str(), CV_LOAD_IMAGE_COLOR);
 
@@ -43,7 +44,10 @@ int main( int argc, char** argv )
 	std::vector<cv::Point> contour = cartographer->getContour();
 	Mat image = cartographer->getCuted().clone();
 
-	imshow("z1", image);
+	Mat image22 = cartographer->getBordered(false);
+
+	imshow("z1", image22);
+	waitKey(0);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -59,7 +63,7 @@ int main( int argc, char** argv )
 	starting = rec.straightenPoint(starting);
 
 	// circle(tmp, Point(maxX2, maxY2), 4, Scalar(0,0,255), 3, 1, 0);
-	circle(tmp, starting, 2, Scalar(0,0,255), 2, 1, 0);
+	// circle(tmp, starting, 2, Scalar(0,0,255), 2, 1, 0);
 
 
 //////////////////////////////////////////////////////////////////
@@ -76,7 +80,7 @@ int main( int argc, char** argv )
 		Point2f p = contour[i];
 		p = rec.straightenPoint(p);
 		contour[i] = p;
-		circle(tmp, contour[i], 15, Scalar(0,0,255), 1, 1, 0);
+		// circle(tmp, contour[i], 2, Scalar(0,0,255), 1, 1, 0);
 	}
 
 ///////////////////////////////////////////////////////////////////
@@ -95,7 +99,8 @@ int main( int argc, char** argv )
 	for (size_t i = 0; i < foldingRule->getPoints().size(); i++)
 	{
 		line(tmp, starting, foldingRule->getPoints()[i], Scalar(0,255,0), 1,1,0);
-		circle(tmp, foldingRule->getPoints()[i], 1, Scalar(0,255,0), 1, 1, 0);
+		circle(tmp, foldingRule->getPoints()[i], 1, Scalar(0,0,255), 1, 1, 0);
+		circle(tmp, starting, 2, Scalar(255,0,0), 2, 1, 0);
 
 		imshow("z1", tmp);
 		waitKey(10);

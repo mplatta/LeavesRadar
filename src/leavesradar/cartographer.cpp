@@ -61,7 +61,7 @@ void Cartographer::cutImage()
 	int max_frame_x = ((max_x + frame) < this->src.size().width) ? max_x - min_frame_x + frame : this->src.size().width - min_frame_x;
 	int max_frame_y = ((max_y + frame) < this->src.size().height) ? max_y - min_frame_y + frame : this->src.size().height - min_frame_y;
 
-	this->cuted = cv::Mat(this->src.clone(), cv::Rect(min_frame_x, min_frame_y, max_frame_x, max_frame_y));
+	this->cutted = cv::Mat(this->src.clone(), cv::Rect(min_frame_x, min_frame_y, max_frame_x, max_frame_y));
 
 	for (size_t i = 0; i < contour_.size(); i++)
 	{
