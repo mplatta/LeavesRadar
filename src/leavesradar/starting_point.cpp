@@ -1,6 +1,6 @@
 #include "starting_point.hpp"
 
-void StartingPoint::setImgEdge(cv::Mat img){
+void StartingPoint::setImgBin(cv::Mat img){
 	// formatted_log("Size this [%d, %d]", this->img.rows, this->img.cols);
 	// formatted_log("Size img [%d, %d]", img.rows, img.cols);
 
