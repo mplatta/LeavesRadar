@@ -51,10 +51,10 @@ Simple neural network
 
 * training network
 ```sh
-$ python3 --path path/to/histograms -t
+$ python3 classificator.py --path path/to/histograms -t
 ```
 
 * classification
 ```sh
-$ python3 --path path/to/histogra.txt
+$ python3 classificator.py --path path/to/histogra.txt
 ```
